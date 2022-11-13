@@ -19,6 +19,8 @@
     "hardhat": "^2.11.1",
     "hardhat-gas-reporter": "^1.0.8",
     "mocha": "^10.1.0",
+    "prettier": "^2.7.1",
+    "prettier-plugin-solidity": "^1.0.0-rc.1",
     "solidity-coverage": "^0.8.0",
     "ts-node": ">=8.0.0",
     "typechain": "^8.1.0",
