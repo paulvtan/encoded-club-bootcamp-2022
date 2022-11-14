@@ -45,10 +45,13 @@ describe("Ballot", () => {
       expect(acc1Voter.weight).to.eq(1)
     })
     it("can not give right to vote for someone that has voted", async () => {
-      // TODO
+      const voteTx = await ballotContract.connect(accounts[1]).vote(0)
+      await voteTx.wait()
+      await expect(
+        ballotContract.giveRightToVote(accounts[1].address)
+      ).to.be.revertedWith("The voter already voted.")
     })
     it("can not give right to vote for someone that already has voting rights", async () => {
-      // TODO
       const selectedVoter = accounts[1].address
       await expect(
         ballotContract.giveRightToVote(selectedVoter)
