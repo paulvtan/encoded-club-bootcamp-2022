@@ -17,13 +17,14 @@ async function main() {
     etherscan: process.env.ETHERSCAN_API_KEY,
     infura: process.env.INFURA_API_KEY,
   })
-  const wallet = ethers.Wallet.fromMnemonic(process.env.MNEMONIC ?? "")
+  const wallet = ethers.Wallet.createRandom()
   const signer = wallet.connect(provider)
+  console.log(`Connected to the wallet of ${signer.address}`)
   const balance = await signer.getBalance()
   console.log(`This address has a balance of ${balance} wei.`)
+  if (balance.eq(0)) throw new Error("I'm too poor.")
   // const ballotContracFactory = await ethers.getContractFactory("Ballot")
   // const ballotContractFactory = new Ballot__factory(accounts[0])
-  if (balance.eq(0)) throw new Error("I'm too poor.")
   const ballotContractFactory = new Ballot__factory(signer)
   const ballotContract = await ballotContractFactory.deploy(
     proposals.map((prop) => ethers.utils.formatBytes32String(prop))
