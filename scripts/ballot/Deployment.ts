@@ -4,6 +4,10 @@ import { Ballot__factory } from "../../typechain-types"
 import * as dotenv from "dotenv"
 dotenv.config()
 
+// This script deploy Ballot.sol contract to Goerli test net.
+// example: yarn run ts-node --files .\scripts\ballot\Deployment.ts "Chocolate" "Vanilla" "Mint"
+// This deploy a ballot with 3 proposals "Chocolate" "Vanilla" "Mint"
+// Reference: https://docs.soliditylang.org/en/v0.8.17/solidity-by-example.html
 async function main() {
   console.log("Deploying Ballot contract")
   console.log("Proposals: ")
