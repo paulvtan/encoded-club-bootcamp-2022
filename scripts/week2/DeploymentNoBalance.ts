@@ -5,7 +5,7 @@ import * as dotenv from "dotenv"
 dotenv.config()
 
 // This script deploy Ballot.sol contract to Goerli test net, but instead of using pre-funded account it uses a random wallet which has no balance.
-// example: yarn run ts-node --files .\scripts\ballot\DeploymentNoBalance.ts "Chocolate" "Vanilla" "Mint"
+// example: yarn run ts-node --files .\scripts\week2\DeploymentNoBalance.ts "Chocolate" "Vanilla" "Mint"
 // ❌ This deployment will fail as it uses a wallet with no ETH to pay for gas fee.
 // It will not pass if statement check and output "Error: I'm too poor."
 // Reference: https://docs.soliditylang.org/en/v0.8.17/solidity-by-example.html

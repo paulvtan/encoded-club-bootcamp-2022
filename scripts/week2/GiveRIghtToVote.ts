@@ -24,7 +24,7 @@ async function main() {
   console.log(`This address has a balance of ${balance} wei.`)
   if (balance.eq(0)) throw new Error("I'm too poor.")
   const ballotContractFactory = new Ballot__factory(signer)
-  const ballotContract = await ballotContractFactory.attach(contractAddress)
+  const ballotContract = ballotContractFactory.attach(contractAddress)
   console.log(
     `Attaching to a smart contract deployed at ${ballotContract.address}`
   )

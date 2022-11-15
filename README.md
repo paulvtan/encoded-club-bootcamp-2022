@@ -11,6 +11,9 @@ to learn Solidity and blockchain from scratch!
 [ETHDenver Bootcamp 2022 - Notion site](https://encodeclub.notion.site/ETHDenver-Bootcamp-e895531f5e4540278ab4bde62e1aac0a)
 
 # Quick Start Guide
+
+**yarn package manager is required.*
+
 The scripts in this reposoritory relies on the following API keys 
 - `ALCHEMY_API_KEY`
 - `ETHERSCAN_API_KEY`
