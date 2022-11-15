@@ -1,13 +1,7 @@
-# Sample Hardhat Project
+# ETHDenver Bootcamp,
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+This repository contains all the code I developed during the study of ETHDenver & Solidity bootcamps.
 
-Try running some of the following tasks:
-
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.ts
-```
+Powered by Encode Club
+A free, intensive, 8-week coding bootcamp
+to learn Solidity and blockchain from scratch!
