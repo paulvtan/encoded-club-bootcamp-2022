@@ -1,10 +1,10 @@
 import { expect } from "chai"
 import { ethers } from "hardhat"
 // https://github.com/dethcrypto/TypeChain
-import { HelloWorld } from "../typechain-types"
+import { HelloWorld } from "../../typechain-types"
 
 // https://mochajs.org/#getting-started
-describe("HelloWorld Example - Lecture 06", function () {
+describe("W1:L6 - HelloWorld Example", function () {
   let helloWorldContract: HelloWorld
 
   // https://mochajs.org/#hooks

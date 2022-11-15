@@ -1,7 +1,7 @@
 import { ethers } from "hardhat"
 import { expect } from "chai"
 
-describe("Hello World", () => {
+describe("W1 - Hello World", () => {
   it("should display all signers and their balance from ethers.js", async () => {
     const signers = await ethers.getSigners()
     signers.forEach(async (signer) => {

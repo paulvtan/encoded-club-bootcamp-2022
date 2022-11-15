@@ -5,7 +5,7 @@ import * as dotenv from "dotenv"
 dotenv.config()
 
 // This script deploy Ballot.sol contract to Goerli test net.
-// example: yarn run ts-node --files .\scripts\ballot\Deployment.ts "Chocolate" "Vanilla" "Mint"
+// example: yarn run ts-node --files .\scripts\week2\Deployment.ts "Chocolate" "Vanilla" "Mint"
 // This deploy a ballot with 3 proposals "Chocolate" "Vanilla" "Mint"
 // Reference: https://docs.soliditylang.org/en/v0.8.17/solidity-by-example.html
 async function main() {

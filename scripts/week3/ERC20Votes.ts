@@ -1,5 +1,5 @@
 import { ethers } from "hardhat"
-import { MyToken__factory } from "../typechain-types"
+import { MyToken__factory } from "../../typechain-types"
 
 const MINT_VALUE = ethers.utils.parseEther("10")
 
