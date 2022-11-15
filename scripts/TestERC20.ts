@@ -6,7 +6,7 @@ const MINTER_ROLE_CODE =
 async function main() {
   const accounts = await ethers.getSigners()
   // Deploy MyToken contract and mint the supply to acc0
-  const tokenContractFactory = await ethers.getContractFactory("MyToken")
+  const tokenContractFactory = await ethers.getContractFactory("MyERC20")
   const tokenContract = await tokenContractFactory.deploy()
   await tokenContract.deployed()
   console.log(`Contract deployed at ${tokenContract.address}`)
