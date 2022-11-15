@@ -1,6 +1,6 @@
 import { sign } from "crypto"
 import { ethers } from "ethers"
-import { Ballot__factory } from "../typechain-types"
+import { Ballot__factory } from "../../typechain-types"
 import * as dotenv from "dotenv"
 dotenv.config()
 

@@ -1,12 +1,12 @@
 import { ethers } from "hardhat"
-import { MyToken2__factory } from "../typechain-types"
+import { MyToken__factory } from "../typechain-types"
 
 const MINT_VALUE = ethers.utils.parseEther("10")
 
 async function main() {
   const accounts = await ethers.getSigners()
   // Deploy the contract
-  const contractFactory = new MyToken2__factory(accounts[0])
+  const contractFactory = new MyToken__factory(accounts[0])
   const contract = await contractFactory.deploy()
   await contract.deployed()
   console.log(`Token contract deployed at ${contract.address}`)
