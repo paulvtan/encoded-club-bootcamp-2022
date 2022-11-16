@@ -1,8 +1,10 @@
 import { sign } from "crypto"
-import { ethers } from "ethers"
-import { Ballot__factory } from "../../typechain-types"
 import * as dotenv from "dotenv"
-import { displayAccountInfo } from "../common/Helper"
+import { ethers } from "ethers"
+
+import { Ballot__factory } from "../../typechain-types"
+import { displayAccountInfo, getSigner } from "../common/Helper"
+
 dotenv.config()
 
 // This script deploy Ballot.sol contract to Goerli test net.
@@ -16,14 +18,7 @@ async function main() {
   proposals.forEach((element, index) => {
     console.log(`Proposal N. ${index + 1}: ${element}`)
   })
-
-  const provider = ethers.getDefaultProvider("goerli", {
-    alchemy: process.env.ALCHEMY_API_KEY,
-    etherscan: process.env.ETHERSCAN_API_KEY,
-    infura: process.env.INFURA_API_KEY,
-  })
-  const wallet = ethers.Wallet.fromMnemonic(process.env.MNEMONIC ?? "")
-  const signer = wallet.connect(provider)
+  const signer = getSigner()
   const balance = await displayAccountInfo(signer)
   // const ballotContracFactory = await ethers.getContractFactory("Ballot")
   // const ballotContractFactory = new Ballot__factory(accounts[0])
