@@ -2,6 +2,7 @@ import { sign } from "crypto"
 import { ethers } from "ethers"
 import { Ballot__factory } from "../../typechain-types"
 import * as dotenv from "dotenv"
+import { displayAccountInfo } from "../common/Helper"
 dotenv.config()
 
 // This script delegate your vote to the target address.
@@ -19,8 +20,7 @@ async function main() {
   })
   const wallet = ethers.Wallet.fromMnemonic(process.env.MNEMONIC ?? "")
   const signer = wallet.connect(provider)
-  console.log(`Connected to the wallet of ${signer.address}`)
-  console.log(`This address has a balance of ${await signer.getBalance()} wei.`)
+  await displayAccountInfo(signer)
   const ballotContractFactory = new Ballot__factory(signer)
   const ballotContract = ballotContractFactory.attach(contractAddress)
   console.log(`Delegating voting right to target address: ${targetAddress}`)

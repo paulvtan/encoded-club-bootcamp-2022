@@ -2,6 +2,7 @@ import { sign } from "crypto"
 import { ethers } from "ethers"
 import { Ballot__factory } from "../../typechain-types"
 import * as dotenv from "dotenv"
+import { displayAccountInfo } from "../common/Helper"
 dotenv.config()
 
 // This script gets the name of the proposal with the most vote.
@@ -19,8 +20,7 @@ async function main() {
   })
   const wallet = ethers.Wallet.fromMnemonic(process.env.MNEMONIC ?? "")
   const signer = wallet.connect(provider)
-  console.log(`Connected to the wallet of ${signer.address}`)
-  console.log(`This address has a balance of ${await signer.getBalance()} wei.`)
+  await displayAccountInfo(signer)
   const ballotContractFactory = new Ballot__factory(signer)
   const ballotContract = ballotContractFactory.attach(contractAddress)
   const winningProposalNo = await ballotContract.winningProposal()
@@ -28,7 +28,8 @@ async function main() {
   const proposalName = ethers.utils.parseBytes32String(proposal.name)
   console.log(`The winning proposal is: ${proposalName}`)
   const winner = await ballotContract.winnerName()
-  console.log(`${ethers.utils.parseBytes32String(winner)} is the winner!`)
+  const winnerName = ethers.utils.parseBytes32String(winner)
+  console.log(`${winnerName} won the ballot!`)
 }
 
 main().catch((error) => {

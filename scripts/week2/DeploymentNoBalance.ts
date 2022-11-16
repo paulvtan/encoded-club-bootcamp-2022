@@ -2,6 +2,7 @@ import { sign } from "crypto"
 import { ethers } from "ethers"
 import { Ballot__factory } from "../../typechain-types"
 import * as dotenv from "dotenv"
+import { displayAccountInfo } from "../common/Helper"
 dotenv.config()
 
 // This script deploy Ballot.sol contract to Goerli test net, but instead of using pre-funded account it uses a random wallet which has no balance.
@@ -24,9 +25,7 @@ async function main() {
   })
   const wallet = ethers.Wallet.createRandom()
   const signer = wallet.connect(provider)
-  console.log(`Connected to the wallet of ${signer.address}`)
-  const balance = await signer.getBalance()
-  console.log(`This address has a balance of ${balance} wei.`)
+  const balance = await displayAccountInfo(signer)
   if (balance.eq(0)) throw new Error("I'm too poor.")
   // const ballotContracFactory = await ethers.getContractFactory("Ballot")
   // const ballotContractFactory = new Ballot__factory(accounts[0])

@@ -2,6 +2,7 @@ import { sign } from "crypto"
 import { ethers } from "ethers"
 import { Ballot__factory } from "../../typechain-types"
 import * as dotenv from "dotenv"
+import { displayAccountInfo } from "../common/Helper"
 dotenv.config()
 
 // This script deploy Ballot.sol contract to Goerli test net.
@@ -23,8 +24,7 @@ async function main() {
   })
   const wallet = ethers.Wallet.fromMnemonic(process.env.MNEMONIC ?? "")
   const signer = wallet.connect(provider)
-  const balance = await signer.getBalance()
-  console.log(`This address has a balance of ${balance} wei.`)
+  const balance = await displayAccountInfo(signer)
   // const ballotContracFactory = await ethers.getContractFactory("Ballot")
   // const ballotContractFactory = new Ballot__factory(accounts[0])
   if (balance.eq(0)) throw new Error("I'm too poor.")
