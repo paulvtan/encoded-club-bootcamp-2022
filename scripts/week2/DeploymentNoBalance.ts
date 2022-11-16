@@ -1,9 +1,15 @@
 import { sign } from "crypto"
 import { ethers } from "ethers"
-import { Ballot__factory } from "../typechain-types"
+import { Ballot__factory } from "../../typechain-types"
 import * as dotenv from "dotenv"
+import { displayAccountInfo } from "../common/Helper"
 dotenv.config()
 
+// This script deploy Ballot.sol contract to Goerli test net, but instead of using pre-funded account it uses a random wallet which has no balance.
+// example: yarn run ts-node --files .\scripts\week2\DeploymentNoBalance.ts "Chocolate" "Vanilla" "Mint"
+// ❌ This deployment will fail as it uses a wallet with no ETH to pay for gas fee.
+// It will not pass if statement check and output "Error: I'm too poor."
+// Reference: https://docs.soliditylang.org/en/v0.8.17/solidity-by-example.html
 async function main() {
   console.log("Deploying Ballot contract")
   console.log("Proposals: ")
@@ -17,13 +23,12 @@ async function main() {
     etherscan: process.env.ETHERSCAN_API_KEY,
     infura: process.env.INFURA_API_KEY,
   })
-  const wallet = ethers.Wallet.fromMnemonic(process.env.MNEMONIC ?? "")
+  const wallet = ethers.Wallet.createRandom()
   const signer = wallet.connect(provider)
-  const balance = await signer.getBalance()
-  console.log(`This address has a balance of ${balance} wei.`)
+  const balance = await displayAccountInfo(signer)
+  if (balance.eq(0)) throw new Error("I'm too poor.")
   // const ballotContracFactory = await ethers.getContractFactory("Ballot")
   // const ballotContractFactory = new Ballot__factory(accounts[0])
-  if (balance.eq(0)) throw new Error("I'm too poor.")
   const ballotContractFactory = new Ballot__factory(signer)
   const ballotContract = await ballotContractFactory.deploy(
     proposals.map((prop) => ethers.utils.formatBytes32String(prop))

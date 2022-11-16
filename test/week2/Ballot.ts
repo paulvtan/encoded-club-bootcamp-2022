@@ -1,11 +1,11 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers"
 import { expect } from "chai"
 import { ethers } from "hardhat"
-import { Ballot } from "../typechain-types"
+import { Ballot } from "../../typechain-types"
 
 const PROPOSALS = ["Chocolate", "Vanilla", "Lemon", "Cookie"]
 
-describe("Ballot", () => {
+describe("W2 - Ballot", () => {
   let ballotContract: Ballot
   let accounts: SignerWithAddress[]
   beforeEach(async () => {

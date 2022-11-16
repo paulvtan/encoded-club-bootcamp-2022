@@ -1,5 +1,7 @@
 import { ethers } from "hardhat"
 
+// This script simply grabs the latest blocknumber of the goerli test net.
+// Usage: yarn hardhat run .\scripts\common\GetLastestBlock.ts
 async function main() {
   const provider = ethers.getDefaultProvider("goerli", {
     alchemy: process.env.ALCHEMY_API_KEY,

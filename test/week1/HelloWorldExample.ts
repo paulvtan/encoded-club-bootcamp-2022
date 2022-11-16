@@ -1,10 +1,10 @@
 import { expect } from "chai"
 import { ethers } from "hardhat"
 // https://github.com/dethcrypto/TypeChain
-import { HelloWorld } from "../typechain-types"
+import { HelloWorld } from "../../typechain-types"
 
 // https://mochajs.org/#getting-started
-describe("HelloWorld Example - Lecture 06", function () {
+describe("W1:L6 - HelloWorld Example", function () {
   let helloWorldContract: HelloWorld
 
   // https://mochajs.org/#hooks
@@ -47,17 +47,26 @@ describe("HelloWorld Example - Lecture 06", function () {
   })
 
   it("Should execute transferOwnership correctly", async function () {
-    // TODO
-    throw Error("Not implemented")
+    const accounts = await ethers.getSigners()
+    const tx = await helloWorldContract.transferOwnership(accounts[1].address)
+    tx.wait()
+    const newOwner = await helloWorldContract.owner()
+    expect(newOwner).to.eq(accounts[1].address)
   })
 
   it("Should not allow anyone other than owner to change text", async function () {
-    // TODO
-    throw Error("Not implemented")
+    const accounts = await ethers.getSigners()
+    await expect(
+      helloWorldContract.connect(accounts[1]).setText("Nice!")
+    ).to.be.revertedWith("Caller is not the owner")
   })
 
   it("Should change text correctly", async function () {
-    // TODO
-    throw Error("Not implemented")
+    const accounts = await ethers.getSigners()
+    const text = "Nice!"
+    const tx = await helloWorldContract.setText(text)
+    tx.wait()
+    const newText = await helloWorldContract.helloWorld()
+    expect(newText).to.eq(text)
   })
 })

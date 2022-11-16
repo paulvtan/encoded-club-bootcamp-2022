@@ -2783,7 +2783,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ethers@npm:^5.4.7":
+"ethers@npm:^5.7.2":
   version: 5.7.2
   resolution: "ethers@npm:5.7.2"
   dependencies:
@@ -5256,7 +5256,7 @@ __metadata:
     "@types/node": ">=12.0.0"
     chai: ^4.2.0
     dotenv: ^16.0.3
-    ethers: ^5.4.7
+    ethers: ^5.7.2
     hardhat: ^2.11.1
     hardhat-gas-reporter: ^1.0.8
     mocha: ^10.1.0
