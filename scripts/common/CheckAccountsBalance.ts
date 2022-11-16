@@ -1,5 +1,6 @@
 import { sign } from "crypto"
-import { ethers, Signer } from "ethers"
+import { Signer, ethers } from "ethers"
+
 import { displayAccountInfo, getSigner } from "./Helper"
 
 // This script takes a number then display address and balance of each account up to the number specified (Accounts from mnemonic in .env).

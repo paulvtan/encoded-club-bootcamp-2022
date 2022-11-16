@@ -1,8 +1,10 @@
 import { sign } from "crypto"
-import { ethers } from "ethers"
-import { Ballot__factory } from "../../typechain-types"
 import * as dotenv from "dotenv"
+import { ethers } from "ethers"
+
+import { Ballot__factory } from "../../typechain-types"
 import { displayAccountInfo, getSigner } from "../common/Helper"
+
 dotenv.config()
 
 // This script output the chairperson address of target Ballot.sol contract address.
