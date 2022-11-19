@@ -1,17 +1,20 @@
 import { ethers } from "hardhat"
 
+// This script test the behavior of .\contracts\week3\RoleBasedERC20.sol
+// cmd: yarn hardhat run .\scripts\week3\TestRoleBasedERC20.ts
 const MINTER_ROLE_CODE =
   "0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6"
 
 async function main() {
   const accounts = await ethers.getSigners()
   // Deploy MyToken contract and mint the supply to acc0
-  const tokenContractFactory = await ethers.getContractFactory("MyERC20")
+  const tokenContractFactory = await ethers.getContractFactory("RoleBasedERC20")
   const tokenContract = await tokenContractFactory.deploy()
   await tokenContract.deployed()
   console.log(`Contract deployed at ${tokenContract.address}`)
   // If you don't know what the hash is for MINTER_ROLE you can call getter like the following.
   const hashCode = await tokenContract.MINTER_ROLE()
+  console.log(`Has code of the minter role is: ${hashCode}`)
   // Giving role MINTER to acc2
   const roleTx = await tokenContract.grantRole(
     MINTER_ROLE_CODE,

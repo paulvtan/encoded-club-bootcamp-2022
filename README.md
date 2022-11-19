@@ -10,6 +10,14 @@ to learn Solidity and blockchain from scratch!
 
 [ETHDenver Bootcamp 2022 - Notion site](https://encodeclub.notion.site/ETHDenver-Bootcamp-e895531f5e4540278ab4bde62e1aac0a)
 
+## Week 1 - HelloWorld.sol
+
+## Week 2 - Ballot.sol
+
+## Week 3 - TokenizedBallot.sol
+- ERC20
+- Role Based Access Control
+
 # Quick Start Guide
 
 **yarn package manager is required.*
