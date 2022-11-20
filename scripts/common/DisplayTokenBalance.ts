@@ -14,7 +14,7 @@ export const displayTokenBalance = async (
   console.log(`Account: ${address}`)
   console.log(`Has the balance of ${accountBalanceDecimals} decimals`)
   console.log(
-    `Represents: ${Number(accountBalanceDecimals) / 10 ** decimals} $${symbol}`
+    `Represents: ${accountBalanceDecimals.div(10 ** decimals)} $${symbol}`
   )
   console.log(`\n`)
 }
