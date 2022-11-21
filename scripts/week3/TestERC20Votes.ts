@@ -5,7 +5,7 @@ import { VoteToken__factory } from "../../typechain-types"
 const MINT_VALUE = ethers.utils.parseEther("10")
 
 // This interacts with ERC20Votes.sol contract which demonstrate the power of ERC20Votes - Tokenized Vote.
-// cmd: yarn hardhat run .\scripts\week3\ERC20Votes.ts
+// cmd: yarn hardhat run .\scripts\week3\TestERC20Votes.ts
 
 async function main() {
   const accounts = await ethers.getSigners()
@@ -40,7 +40,7 @@ async function main() {
   console.log(
     `Account ${
       accounts[1].address
-    } has ${votes.toString()} units of voting power before selft delegating.`
+    } has ${votes.toString()} units of voting power before self delegating.`
   )
   // Self delegate - (delegate is built into the token contract rather than Ballot contract)
   const delegateTx = await contract
