@@ -1,4 +1,3 @@
-import { sign } from "crypto"
 import * as dotenv from "dotenv"
 import { ethers } from "ethers"
 
