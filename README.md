@@ -1,4 +1,4 @@
-# ETHDenver Bootcamp (Late 2022),
+# Solidity Bootcamp (Oct 2022) & ETHDenver Bootcamp (Late)
 
 This repository contains all the code I developed during the study of ETHDenver & Solidity bootcamps.
 
@@ -8,8 +8,9 @@ to learn Solidity and blockchain from scratch!
 
 [ETHDenver Bootcamp 2022 by Encoded Club](https://medium.com/encode-club/announcing-the-ethdenver-bootcamp-powered-by-encode-club-apply-now-a2fb1863bafb)
 
-[ETHDenver Bootcamp 2022 - Notion site](https://encodeclub.notion.site/ETHDenver-Bootcamp-e895531f5e4540278ab4bde62e1aac0a)
+[Solidyt Bootcamp 2022 by Encoded Club](https://www.encode.club/solidity-bootcamps)
 
+# Content
 ## Week 1 - HelloWorld.sol
 
 ## Week 2 - Ballot.sol
@@ -18,7 +19,7 @@ to learn Solidity and blockchain from scratch!
 - ERC20
 - Role Based Access Control
 
-## Week 4 - 
+## Week 4 - Frontend & Backend
 # Quick Start Guide
 
 **yarn package manager is required.*
@@ -50,7 +51,7 @@ Following extensions are reccomended for working with this project.
 
 # High-level Project Structure
 ## `contract` 
-Contains solidity `.sol` contract, compiled into bytecode and deployed to goerli test net using `Deployment.ts script`
+Contains solidity `.sol` contract, compiled into bytecode and deployed to goerli test net using `Deployment.ts` script.
 
 ## `script`
 Contains scripts to automate contract deployment to blockchain, interact with the deployed contract. Written in TypeScript. 
