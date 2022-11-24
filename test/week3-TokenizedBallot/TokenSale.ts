@@ -3,7 +3,7 @@ import { expect } from "chai"
 import { BigNumber } from "ethers"
 import { ethers } from "hardhat"
 
-import { calculateGasCosts } from "../../scripts/common/CalculateGasCosts"
+import { calculateGasCosts } from "../../scripts/common/Helper"
 import {
   MyERC721Token,
   MyERC721Token__factory,
