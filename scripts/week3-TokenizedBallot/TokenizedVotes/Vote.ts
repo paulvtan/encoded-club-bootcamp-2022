@@ -2,15 +2,19 @@ import * as dotenv from "dotenv"
 import { ethers } from "ethers"
 
 import { TokenizedBallot__factory } from "../../../typechain-types"
-import { displayAccountInfo, getSigner } from "../../common/Helper"
-import { TOKENIZED_BALLOT_CONTRACT } from "./constants"
+import {
+  displayAccountInfo,
+  getContractAddressByName,
+  getSigner,
+} from "../../common/Helper"
 
 dotenv.config()
 
 // This script spent your voting power to vote for specified proposal number.
 // example: yarn run ts-node --files .\scripts\week3\TokenizedVotes\Vote.ts "2" "100"
 async function main() {
-  const contractAddress = TOKENIZED_BALLOT_CONTRACT
+  const contractAddress =
+    process.argv[4] ?? (await getContractAddressByName("TokenizedBallot.sol"))
   const proporsalNo = process.argv[2]
   const amount = process.argv[3]
   const signer = getSigner()

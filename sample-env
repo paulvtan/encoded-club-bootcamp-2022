@@ -1,4 +1,5 @@
 # multiple services api key to connect to network
+# https://docs.ethers.io/v5/api-keys/
 MNEMONIC=""
 NETWORK=""
 INFURA_API_KEY=""

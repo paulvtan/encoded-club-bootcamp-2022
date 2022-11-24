@@ -52,10 +52,11 @@ export const displayTokenBalance = async (
 
 export const getProvider = () => {
   const provider = ethers.getDefaultProvider(process.env.NETWORK, {
-    alchemy: process.env.ALCHEMY_API_KEY,
     etherscan: process.env.ETHERSCAN_API_KEY,
+    alchemy: process.env.ALCHEMY_API_KEY,
     infura: process.env.INFURA_API_KEY,
   })
+  // const provider = ethers.getDefaultProvider("goerli")
   return provider
 }
 

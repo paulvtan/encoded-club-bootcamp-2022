@@ -6,7 +6,6 @@ import { Ballot__factory } from "../../typechain-types"
 import {
   displayAccountInfo,
   getContractAddressByName,
-  getProvider,
   getSigner,
 } from "../common/Helper"
 

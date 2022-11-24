@@ -2,9 +2,8 @@ import * as dotenv from "dotenv"
 import { ethers } from "hardhat"
 
 import { TokenizedBallot__factory } from "../../../typechain-types"
-import { getLatestBlock } from "../../common/GetLastestBlock"
+import { getContractAddressByName, getLatestBlock } from "../../common/Helper"
 import { displayAccountInfo, getSigner } from "../../common/Helper"
-import { VOTE_TOKEN_CONTRACT } from "./constants"
 
 dotenv.config()
 
@@ -19,7 +18,7 @@ async function main() {
   if (balance.eq(0)) throw new Error("I'm too poor.")
 
   // Make sure you've deployed your vote token contract first.
-  const tokenContract = VOTE_TOKEN_CONTRACT
+  const tokenContract = await getContractAddressByName("ERC20Votes.sol")
   // Snapshot current block number - Any manipulation of VoteToken after contract deployment doesn't count.
   const targetBlockNumber = (await getLatestBlock()).number + 13 // +13 so the ballot closes in one hour.
   const proposals = process.argv.slice(2)
