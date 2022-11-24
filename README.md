@@ -22,6 +22,10 @@ to learn Solidity and blockchain from scratch!
 ## Week 4 - Frontend & Backend
 # Quick Start Guide
 
+```
+yarn: 3.2.4
+node: v18.12.1
+```
 **yarn package manager is required.*
 
 The scripts in this reposoritory relies on the following API keys 
@@ -33,6 +37,7 @@ The scripts in this reposoritory relies on the following API keys
 ```typescript
 // sample .env file at root
 MNEMONIC=""
+NETWORK=""
 INFURA_API_KEY=""
 ALCHEMY_API_KEY=""
 ETHERSCAN_API_KEY=""

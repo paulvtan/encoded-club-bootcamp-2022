@@ -1,5 +1,6 @@
 # multiple services api key to connect to network
 MNEMONIC=""
+NETWORK=""
 INFURA_API_KEY=""
 ALCHEMY_API_KEY=""
 ETHERSCAN_API_KEY=""
