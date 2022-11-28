@@ -8,7 +8,7 @@ import { displayAccountInfo, getSigner } from "../../common/Helper"
 dotenv.config()
 
 // This script deploy TokenizedBallot.sol contract to Goerli test net.
-// example: yarn run ts-node --files .\scripts\week3\TokenizedVotes\TokenizedBallotDeployment.ts "Water" "Coffee" "Tea"
+// example: yarn run ts-node --files .\scripts\week3-TokenizedBallot\TokenizedVotes\TokenizedBallotDeployment.ts "Water" "Coffee" "Tea"
 // This deploy a tokenized ballot with 3 proposals, voting power is snapshoted, only those with existing voting power can vote on this."
 // Reference: https://docs.soliditylang.org/en/v0.8.17/solidity-by-example.html
 
@@ -20,7 +20,7 @@ async function main() {
   // Make sure you've deployed your vote token contract first.
   const tokenContract = await getContractAddressByName("ERC20Votes.sol")
   // Snapshot current block number - Any manipulation of VoteToken after contract deployment doesn't count.
-  const targetBlockNumber = (await getLatestBlock()).number + 13 // +13 so the ballot closes in one hour.
+  const targetBlockNumber = (await getLatestBlock()).number
   const proposals = process.argv.slice(2)
   console.log(`Snapshot taken at the current blocknumber: ${targetBlockNumber}`)
   proposals.forEach((element, index) => {

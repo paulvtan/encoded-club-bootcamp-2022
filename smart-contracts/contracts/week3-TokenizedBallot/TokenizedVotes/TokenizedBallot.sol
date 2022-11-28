@@ -41,7 +41,7 @@ contract TokenizedBallot {
         proposals[proposal].voteCount += amount; // Increase votes count for that proposal.
     }
 
-    // This function check a voting power of an account by getting voting count prior to targetBlockNumber snapshot minus any you've spent voted.
+    // This function checks the amount of voting power an account has at the time contract was deployed - any this account has spent.
     function votingPower(address account) public view returns (uint256) {
         return
             tokenContract.getPastVotes(account, targetBlockNumber) -

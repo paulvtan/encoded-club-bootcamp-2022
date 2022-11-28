@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { ethers } from 'ethers'
 import { getProvider, getSigner } from './Helper'
 import * as tokenJson from './assets/VoteToken.json'
+import * as tokenizedBallotJson from './assets/TokenizedBallot.json'
 import * as dotenv from 'dotenv'
 dotenv.config()
 
@@ -25,6 +26,7 @@ export class PaymentOrder {
 export class AppService {
   provider: ethers.providers.BaseProvider
   erc20ContractFactory: ethers.ContractFactory
+  tokenizedBallotContractFactory: ethers.ContractFactory
   paymentOrders: PaymentOrder[]
 
   constructor() {
@@ -32,6 +34,11 @@ export class AppService {
     this.erc20ContractFactory = new ethers.ContractFactory(
       tokenJson.abi,
       tokenJson.bytecode,
+    )
+
+    this.tokenizedBallotContractFactory = new ethers.ContractFactory(
+      tokenizedBallotJson.abi,
+      tokenizedBallotJson.bytecode,
     )
     this.paymentOrders = []
   }
@@ -99,7 +106,98 @@ export class AppService {
     const contract = this.erc20ContractFactory
       .attach(contractAddress)
       .connect(signer)
-    const tx = await contract.mint(receiverAddress, amount)
+    const amountBn = ethers.utils.parseEther(amount.toString())
+    const tx = await contract.mint(receiverAddress, amountBn)
+    return tx.wait()
+  }
+
+  async getBalance(address: string) {
+    const contractAddress = process.env.ERC20_VOTE_SOL
+    const signer = getSigner()
+    const contract = this.erc20ContractFactory
+      .attach(contractAddress)
+      .connect(signer)
+    const symbol = await contract.symbol()
+    const balanceBn = await contract.balanceOf(address)
+    const balance = Number(ethers.utils.formatEther(balanceBn))
+    const voteBn = await contract.getVotes(address)
+    const vote = Number(ethers.utils.formatEther(voteBn))
+    return `Balance: ${balance} ${symbol}\nRemaining Vote: ${vote}.`
+  }
+
+  async selfDelegate(accountIndex: number) {
+    const contractAddress = process.env.ERC20_VOTE_SOL
+    const signer = getSigner(accountIndex)
+    const contract = this.erc20ContractFactory
+      .attach(contractAddress)
+      .connect(signer)
+    const tx = await contract.delegate(signer.address)
+    return tx.wait()
+  }
+
+  async transfer(accountIndex = 0, recipientAddress: string, amount: number) {
+    const contractAddress = process.env.ERC20_VOTE_SOL
+    const signer = getSigner(accountIndex)
+    const contract = this.erc20ContractFactory
+      .attach(contractAddress)
+      .connect(signer)
+    const tx = await contract.transfer(
+      recipientAddress,
+      ethers.utils.parseEther(amount.toString()),
+    )
+    return tx.wait()
+  }
+
+  async checkVotePower(
+    contractAddress = process.env.TOKENIZED_BALLOT_SOL,
+    address: string,
+  ) {
+    const signer = getSigner()
+    console.log(`Using tokenized ballot contract: ${contractAddress}`)
+    const contract = this.tokenizedBallotContractFactory
+      .attach(contractAddress)
+      .connect(signer)
+    const votingPower = await contract.votingPower(address)
+    return ethers.utils.formatEther(votingPower)
+  }
+
+  async getProposal(
+    contractAddress = process.env.TOKENIZED_BALLOT_SOL,
+    proposalIndex: number,
+  ) {
+    const signer = getSigner()
+    console.log(`Using tokenized ballot contract: ${contractAddress}`)
+    const contract = this.tokenizedBallotContractFactory
+      .attach(contractAddress)
+      .connect(signer)
+    const { name, voteCount } = await contract.proposals(proposalIndex)
+    const nameFormatted = ethers.utils.parseBytes32String(name)
+    const voteCountFormatted = ethers.utils.formatEther(voteCount)
+    return `Name: ${nameFormatted}\nVote: ${voteCountFormatted}`
+  }
+
+  async getWinner(contractAddress = process.env.TOKENIZED_BALLOT_SOL) {
+    const signer = getSigner()
+    console.log(`Using tokenized ballot contract: ${contractAddress}`)
+    const contract = this.tokenizedBallotContractFactory
+      .attach(contractAddress)
+      .connect(signer)
+    const winningPropsalName = await contract.winnerName()
+    return ethers.utils.parseBytes32String(winningPropsalName)
+  }
+
+  async vote(
+    contractAddress = process.env.TOKENIZED_BALLOT_SOL,
+    proposalIndex: number,
+    amount: number,
+  ) {
+    const signer = getSigner()
+    console.log(`Using tokenized ballot contract: ${contractAddress}`)
+    const contract = this.tokenizedBallotContractFactory
+      .attach(contractAddress)
+      .connect(signer)
+    const amountBn = ethers.utils.parseEther(amount.toString())
+    const tx = await contract.vote(proposalIndex, amountBn)
     return tx.wait()
   }
 }
