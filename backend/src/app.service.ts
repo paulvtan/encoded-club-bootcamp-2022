@@ -3,8 +3,6 @@ import { ethers } from 'ethers'
 import { getProvider, getSigner } from './Helper'
 import * as tokenJson from './assets/VoteToken.json'
 import * as tokenizedBallotJson from './assets/TokenizedBallot.json'
-import * as dotenv from 'dotenv'
-dotenv.config()
 
 export class CreatePaymentOrderDto {
   value: number

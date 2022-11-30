@@ -1,6 +1,4 @@
-import * as dotenv from 'dotenv'
 import { ethers } from 'ethers'
-dotenv.config()
 
 export const getProvider = () => {
   const provider = ethers.getDefaultProvider(process.env.NETWORK, {
