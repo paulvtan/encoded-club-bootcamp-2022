@@ -42,24 +42,28 @@ export class AppComponent {
 
   private updateBlockchaininfo() {
     if (!(this.tokenContract && this.wallet)) return
+    this.tokenContract['balanceOf'](this.wallet.address).then(
+      (tokenBalanceBn: BigNumber) => {
+        this.tokenBalance = parseFloat(ethers.utils.formatEther(tokenBalanceBn))
+        console.log(`Current Balance: ${this.tokenBalance}`)
+      },
+    )
+    this.tokenContract['getVotes'](this.wallet.address).then(
+      (votePowerBn: BigNumber) => {
+        this.votePower = parseFloat(ethers.utils.formatEther(votePowerBn))
+        console.log(`Current Vote Power: ${this.votePower}`)
+      },
+    )
   }
 
   createWallet() {
     if (!(this.provider && this.tokenContract)) return
     this.wallet = ethers.Wallet.createRandom().connect(this.provider)
     this.tokenContract.connect(this.wallet)
-    this.tokenContract['balanceOf'](this.wallet.address).then(
-      (tokenBalanceBn: BigNumber) => {
-        this.tokenBalance = parseFloat(ethers.utils.formatEther(tokenBalanceBn))
-      },
-    )
-    this.tokenContract['getVotes'](this.wallet.address).then(
-      (votePowerBn: BigNumber) => {
-        this.votePower = parseFloat(ethers.utils.formatEther(votePowerBn))
-      },
-    )
+    this.updateBlockchaininfo()
     this.tokenContract.on('Transfer', () => {
-      console.log('Transfer Happened!!!!')
+      console.log('A token transfer detected')
+      this.updateBlockchaininfo()
     })
   }
 
