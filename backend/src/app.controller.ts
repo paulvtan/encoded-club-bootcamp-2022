@@ -1,6 +1,6 @@
-import { Controller, Get, Param, Post, Query } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common'
 import { ApiQuery } from '@nestjs/swagger'
-import { AppService } from './app.service'
+import { AppService, RequestTokenDto } from './app.service'
 
 @Controller()
 export class AppController {
@@ -35,7 +35,7 @@ export class AppController {
   //   return this.appService.requestPaymentOrder(body.id, body.secret)
   // }
 
-  //---------------------------------------------------------------------------
+  //----------------------- For initial Swagger UI experiment -----------------------------
 
   @Get('hello')
   getHello(): string {
@@ -50,6 +50,11 @@ export class AppController {
   @Get('block/:hash')
   getBlock(@Param('hash') hash: string) {
     return this.appService.getBlock(hash)
+  }
+
+  @Get('token-address')
+  getTokenAddress() {
+    return { result: this.appService.getTokenAddress() }
   }
 
   @Get('total-supply')
@@ -108,10 +113,10 @@ export class AppController {
     @Query('amount') amount: number,
   ) {
     return this.appService.mintToken(
-      contractAddress,
-      minterAccountIndex,
       receiverAddress,
       amount,
+      minterAccountIndex,
+      contractAddress,
     )
   }
 
@@ -129,5 +134,14 @@ export class AppController {
     @Query('amount') amount: number,
   ) {
     return this.appService.vote(contractAddress, proposalIndex, amount)
+  }
+
+  // -------------------------- Used by frontend ------------------------------
+
+  @Post('request-token')
+  requestToken(@Body() body: RequestTokenDto): { result: Promise<string> } {
+    return {
+      result: this.appService.mintToken(body.address, body.amount),
+    }
   }
 }

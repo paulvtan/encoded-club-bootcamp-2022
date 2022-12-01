@@ -71,9 +71,9 @@
         </button>
       </div>
       <p>Request token</p>
-      <input #tokenId type="number" class="form-control" min="0" [max]="votePower" placeholder="0" />
+      <input #tokenId type="number" class="form-control" min="0" placeholder="0" />
       <div class="py-3">
-        <button (click)="request()" type="button" class="btn btn-success btn-lg px-4 mx-2">
+        <button (click)="requestToken(tokenId.value)" type="button" class="btn btn-success btn-lg px-4 mx-2">
           Request
         </button>
       </div>

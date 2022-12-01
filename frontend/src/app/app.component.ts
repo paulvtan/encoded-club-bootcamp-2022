@@ -1,8 +1,9 @@
+import { HttpClient } from '@angular/common/http'
 import { Component } from '@angular/core'
 import { BigNumber, ethers } from 'ethers'
 import VoteTokenJson from '../assets/VoteToken.json'
 
-const ERC20VOTES_TOKEN_ADDRESS = '0x111725C04643306563ed5f906aF0Ac6790898495'
+const API_ENDPOINT = 'http://localhost:3000/'
 
 @Component({
   selector: 'app-root',
@@ -20,7 +21,12 @@ export class AppComponent {
   tokenContractAddress: string | undefined
   tokenContract: ethers.Contract | undefined
 
-  constructor() {}
+  constructor(private http: HttpClient) {
+    this.http.get<any>(API_ENDPOINT + 'token-address').subscribe((ans) => {
+      this.tokenContractAddress = ans.result
+      console.log(`Token Contract Address: ${this.tokenContractAddress}`)
+    })
+  }
 
   createWallet() {
     this.provider = ethers.providers.getDefaultProvider('goerli')
@@ -31,10 +37,6 @@ export class AppComponent {
         VoteTokenJson.abi,
         this.wallet,
       )
-
-      this.wallet.getBalance().then((balanceBn) => {
-        this.etherBalance = parseFloat(ethers.utils.formatEther(balanceBn))
-      })
       this.tokenContract['balanceOf'](this.wallet.address).then(
         (tokenBalanceBn: BigNumber) => {
           this.tokenBalance = parseFloat(
@@ -47,6 +49,9 @@ export class AppComponent {
           this.votePower = parseFloat(ethers.utils.formatEther(votePowerBn))
         },
       )
+      this.tokenContract.on('Transfer', () => {
+        console.log('Transfer Happened!!!!')
+      })
     }
   }
 
@@ -54,8 +59,15 @@ export class AppComponent {
     console.log(`Voting for ${voteId}`)
   }
 
-  request() {
+  requestToken(amount: string) {
     console.log(`Requesting token`)
-    return true
+    this.http
+      .post<any>(API_ENDPOINT + 'request-token', {
+        address: this.wallet?.address,
+        amount: Number(amount),
+      })
+      .subscribe((ans) => {
+        console.log(ans.result)
+      })
   }
 }

@@ -20,6 +20,11 @@ export class PaymentOrder {
   secret: string
 }
 
+export class RequestTokenDto {
+  address: string
+  amount: number
+}
+
 @Injectable()
 export class AppService {
   provider: ethers.providers.BaseProvider
@@ -97,6 +102,10 @@ export class AppService {
 
   //-----------------------------------------------------------------------------------
 
+  getTokenAddress(): string {
+    return process.env.ERC20_VOTE_SOL
+  }
+
   // Get the current total minted supply of an ERC20 token.
   async getTotalSupply(
     contractAddress = process.env.ERC20_VOTE_SOL,
@@ -110,10 +119,10 @@ export class AppService {
   }
 
   async mintToken(
-    contractAddress = process.env.ERC20_VOTE_SOL,
-    minterAccountIndex = 0,
     receiverAddress: string,
     amount: number,
+    minterAccountIndex = 0,
+    contractAddress = process.env.ERC20_VOTE_SOL,
   ) {
     const signer = getSigner(minterAccountIndex)
     const contract = this.erc20ContractFactory
@@ -121,7 +130,8 @@ export class AppService {
       .connect(signer)
     const amountBn = ethers.utils.parseEther(amount.toString())
     const tx = await contract.mint(receiverAddress, amountBn)
-    return tx.wait()
+    const receipt: ethers.ContractReceipt = await tx.wait()
+    return receipt.transactionHash
   }
 
   async getBalance(address: string) {

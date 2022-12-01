@@ -1,8 +1,5 @@
-import { Address } from "cluster"
 import { ethers } from "hardhat"
 
-import { BasicToken } from "../../typechain-types"
-import { token } from "../../typechain-types/@openzeppelin/contracts"
 import { displayTokenBalance } from "../common/Helper"
 
 // This script test the behavior of .\contracts\week3\BasicERC20.sol
