@@ -3,7 +3,7 @@ import { Component } from '@angular/core'
 import { BigNumber, ethers } from 'ethers'
 import VoteTokenJson from '../assets/VoteToken.json'
 
-const API_ENDPOINT = 'http://localhost:3000/'
+const API_ENDPOINT = 'http://localhost:3000'
 
 @Component({
   selector: 'app-root',
@@ -23,7 +23,7 @@ export class AppComponent {
 
   constructor(private http: HttpClient) {
     this.provider = ethers.providers.getDefaultProvider('goerli')
-    this.http.get<any>(API_ENDPOINT + 'token-address').subscribe((ans) => {
+    this.http.get<any>(`${API_ENDPOINT}/token-address`).subscribe((ans) => {
       this.tokenContractAddress = ans.result
       console.log(`Token Contract Address: ${this.tokenContractAddress}`)
 
@@ -40,30 +40,31 @@ export class AppComponent {
     )
   }
 
-  private updateBlockchaininfo() {
+  private updateBlockchainInfo() {
     if (!(this.tokenContract && this.wallet)) return
-    this.tokenContract['balanceOf'](this.wallet.address).then(
-      (tokenBalanceBn: BigNumber) => {
-        this.tokenBalance = parseFloat(ethers.utils.formatEther(tokenBalanceBn))
+    console.log(`Updating blockchain state information.`)
+    this.http
+      .get<any>(`${API_ENDPOINT}/token-balance/${this.wallet.address}`)
+      .subscribe((ans) => {
+        this.tokenBalance = ans.result
         console.log(`Current Balance: ${this.tokenBalance}`)
-      },
-    )
-    this.tokenContract['getVotes'](this.wallet.address).then(
-      (votePowerBn: BigNumber) => {
-        this.votePower = parseFloat(ethers.utils.formatEther(votePowerBn))
+      })
+    this.http
+      .get<any>(`${API_ENDPOINT}/vote-balance/${this.wallet.address}`)
+      .subscribe((ans) => {
+        this.votePower = ans.result
         console.log(`Current Vote Power: ${this.votePower}`)
-      },
-    )
+      })
   }
 
   createWallet() {
     if (!(this.provider && this.tokenContract)) return
     this.wallet = ethers.Wallet.createRandom().connect(this.provider)
     this.tokenContract.connect(this.wallet)
-    this.updateBlockchaininfo()
+    this.updateBlockchainInfo()
     this.tokenContract.on('Transfer', () => {
       console.log('A token transfer detected')
-      this.updateBlockchaininfo()
+      this.updateBlockchainInfo()
     })
   }
 
@@ -72,14 +73,15 @@ export class AppComponent {
   }
 
   requestToken(amount: string) {
-    console.log(`Requesting token`)
+    console.log(`Requesting ${amount} token`)
     this.http
-      .post<any>(API_ENDPOINT + 'request-token', {
+      .post<any>(`${API_ENDPOINT}/request-token`, {
         address: this.wallet?.address,
         amount: Number(amount),
       })
       .subscribe((ans) => {
-        console.log(ans.result)
+        const message = `Success - Txn hash: ${ans.result}`
+        console.log(message)
       })
   }
 }

@@ -63,11 +63,6 @@ export class AppController {
     return this.appService.getTotalSupply(address)
   }
 
-  @Get('balance/:address')
-  getBalance(@Param('address') address: string): Promise<string> {
-    return this.appService.getBalance(address)
-  }
-
   // Check account voting power on a particular TokenizedBallot contract, leave blank to use default.
   @Get('check-vote-power')
   @ApiQuery({ name: 'contractAddress', required: false })
@@ -139,9 +134,28 @@ export class AppController {
   // -------------------------- Used by frontend ------------------------------
 
   @Post('request-token')
-  requestToken(@Body() body: RequestTokenDto): { result: Promise<string> } {
+  async requestToken(
+    @Body() body: RequestTokenDto,
+  ): Promise<{ result: string }> {
+    const txHash = await this.appService.mintToken(body.address, body.amount)
     return {
-      result: this.appService.mintToken(body.address, body.amount),
+      result: txHash,
     }
+  }
+
+  @Get('token-balance/:address')
+  async getTokenBalance(
+    @Param('address') address: string,
+  ): Promise<{ result: number }> {
+    const tokenBalance = await this.appService.getTokenBalance(address)
+    return { result: tokenBalance }
+  }
+
+  @Get('vote-balance/:address')
+  async getVoteBalance(
+    @Param('address') address: string,
+  ): Promise<{ result: number }> {
+    const voteBalance = await this.appService.getVoteBalance(address)
+    return { result: voteBalance }
   }
 }

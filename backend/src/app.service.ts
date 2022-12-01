@@ -134,18 +134,28 @@ export class AppService {
     return receipt.transactionHash
   }
 
-  async getBalance(address: string) {
+  async getTokenBalance(address: string) {
     const contractAddress = process.env.ERC20_VOTE_SOL
     const signer = getSigner()
     const contract = this.erc20ContractFactory
       .attach(contractAddress)
       .connect(signer)
-    const symbol = await contract.symbol()
+    // const symbol = await contract.symbol()
     const balanceBn = await contract.balanceOf(address)
     const balance = Number(ethers.utils.formatEther(balanceBn))
+    return balance
+  }
+
+  async getVoteBalance(address: string) {
+    const contractAddress = process.env.ERC20_VOTE_SOL
+    const signer = getSigner()
+    const contract = this.erc20ContractFactory
+      .attach(contractAddress)
+      .connect(signer)
+    // const symbol = await contract.symbol()
     const voteBn = await contract.getVotes(address)
     const vote = Number(ethers.utils.formatEther(voteBn))
-    return `Balance: ${balance} ${symbol}\nRemaining Vote: ${vote}.`
+    return vote
   }
 
   async selfDelegate(accountIndex: number) {
