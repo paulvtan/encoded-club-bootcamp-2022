@@ -17,31 +17,37 @@ export class AppComponent {
   tokenBalance = 0
   votePower = 0
 
+  tokenContractAddress: string | undefined
   tokenContract: ethers.Contract | undefined
 
   constructor() {}
 
   createWallet() {
     this.provider = ethers.providers.getDefaultProvider('goerli')
-    this.wallet = ethers.Wallet.createRandom()
-    this.tokenContract = new ethers.Contract(
-      ERC20VOTES_TOKEN_ADDRESS,
-      VoteTokenJson.abi,
-      this.wallet,
-    )
-    this.wallet.getBalance().then((balanceBn) => {
-      this.etherBalance = parseFloat(ethers.utils.formatEther(balanceBn))
-    })
-    this.tokenContract['balanceOf'](this.wallet.address).then(
-      (tokenBalanceBn: BigNumber) => {
-        this.tokenBalance = parseFloat(ethers.utils.formatEther(tokenBalanceBn))
-      },
-    )
-    this.tokenContract['getVotes'](this.wallet.address).then(
-      (votePowerBn: BigNumber) => {
-        this.votePower = parseFloat(ethers.utils.formatEther(votePowerBn))
-      },
-    )
+    this.wallet = ethers.Wallet.createRandom().connect(this.provider)
+    if (this.tokenContractAddress) {
+      this.tokenContract = new ethers.Contract(
+        this.tokenContractAddress,
+        VoteTokenJson.abi,
+        this.wallet,
+      )
+
+      this.wallet.getBalance().then((balanceBn) => {
+        this.etherBalance = parseFloat(ethers.utils.formatEther(balanceBn))
+      })
+      this.tokenContract['balanceOf'](this.wallet.address).then(
+        (tokenBalanceBn: BigNumber) => {
+          this.tokenBalance = parseFloat(
+            ethers.utils.formatEther(tokenBalanceBn),
+          )
+        },
+      )
+      this.tokenContract['getVotes'](this.wallet.address).then(
+        (votePowerBn: BigNumber) => {
+          this.votePower = parseFloat(ethers.utils.formatEther(votePowerBn))
+        },
+      )
+    }
   }
 
   vote(voteId: string) {
@@ -50,5 +56,6 @@ export class AppComponent {
 
   request() {
     console.log(`Requesting token`)
+    return true
   }
 }

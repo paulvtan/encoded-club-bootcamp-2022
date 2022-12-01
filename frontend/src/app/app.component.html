@@ -1,22 +1,12 @@
 <div class="container py-3">
   <div class="px-4 py-5 my-5 text-center">
-    <img
-      class="d-block mx-auto mb-4"
-      src="../assets/metamask.svg"
-      alt="meta mask icon"
-      width="100"
-      height="100"
-    />
+    <img class="d-block mx-auto mb-4" src="../assets/metamask.svg" alt="meta mask icon" width="100" height="100" />
     <h1 class="display-5 fw-bold">My Web3 App</h1>
     <div class="col-lg-6 mx-auto">
       <div *ngIf="!wallet">
         <p class="lead mb-4">Choose your connection method</p>
         <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-          <button
-            (click)="createWallet()"
-            type="button"
-            class="btn btn-primary btn-lg px-4 gap-3"
-          >
+          <button (click)="createWallet()" type="button" class="btn btn-primary btn-lg px-4 gap-3">
             Create a Wallet
           </button>
           <button type="button" class="btn btn-secondary btn-lg px-4 gap-3">
@@ -29,6 +19,7 @@
       </div>
       <div *ngIf="wallet">
         <p class="lead mb-4">This is your address: {{ wallet.address }}</p>
+        <p class="lead mb-4">The token contract is: {{ tokenContractAddress }}</p>
       </div>
     </div>
   </div>
@@ -72,21 +63,16 @@
       </div>
     </div>
     <div class="px-4 py-3 my-3 mx-5 text-center">
-      <input
-        #voteId
-        type="number"
-        class="form-control"
-        min="0"
-        [max]="votePower"
-        placeholder="0"
-      />
+      <p>Vote for your favourite proposal</p>
+      <input #voteId type="number" class="form-control" min="0" [max]="votePower" placeholder="0" />
       <div class="py-3">
         <button (click)="vote(voteId.value)" type="button" class="btn btn-success btn-lg px-4 mx-2">
           Vote
         </button>
       </div>
+      <p>Request token</p>
+      <input #tokenId type="number" class="form-control" min="0" [max]="votePower" placeholder="0" />
       <div class="py-3">
-        <p>Request Token</p>
         <button (click)="request()" type="button" class="btn btn-success btn-lg px-4 mx-2">
           Request
         </button>

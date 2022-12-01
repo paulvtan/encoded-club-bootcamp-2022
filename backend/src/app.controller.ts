@@ -52,8 +52,9 @@ export class AppController {
     return this.appService.getBlock(hash)
   }
 
-  @Get('total-supply/:address')
-  getTotalSupply(@Param('address') address: string) {
+  @Get('total-supply')
+  @ApiQuery({ name: 'address', required: false })
+  getTotalSupply(@Query('address') address: string) {
     return this.appService.getTotalSupply(address)
   }
 

@@ -24,6 +24,7 @@ export class PaymentOrder {
 export class AppService {
   provider: ethers.providers.BaseProvider
   erc20ContractFactory: ethers.ContractFactory
+  erc20Contract: ethers.Contract
   tokenizedBallotContractFactory: ethers.ContractFactory
   paymentOrders: PaymentOrder[]
 
@@ -38,6 +39,11 @@ export class AppService {
       tokenizedBallotJson.abi,
       tokenizedBallotJson.bytecode,
     )
+
+    this.erc20Contract = this.erc20ContractFactory.attach(
+      process.env.ERC20_VOTE_SOL,
+    )
+
     this.paymentOrders = []
   }
 
@@ -54,10 +60,14 @@ export class AppService {
   }
 
   // Get the current total minted supply of an ERC20 token.
-  async getTotalSupply(address: string): Promise<number> {
+  async getTotalSupply(
+    contractAddress = process.env.ERC20_VOTE_SOL,
+  ): Promise<number> {
+    console.log(`Token contract: ${contractAddress}`)
+    const signer = getSigner()
     const contractInstance = this.erc20ContractFactory
-      .attach(address)
-      .connect(this.provider)
+      .attach(contractAddress)
+      .connect(signer)
     const getTotalSupply = await contractInstance.totalSupply()
     return parseFloat(ethers.utils.formatEther(getTotalSupply))
   }
