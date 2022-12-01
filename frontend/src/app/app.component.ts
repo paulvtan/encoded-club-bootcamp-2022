@@ -22,37 +22,45 @@ export class AppComponent {
   tokenContract: ethers.Contract | undefined
 
   constructor(private http: HttpClient) {
+    this.provider = ethers.providers.getDefaultProvider('goerli')
     this.http.get<any>(API_ENDPOINT + 'token-address').subscribe((ans) => {
       this.tokenContractAddress = ans.result
       console.log(`Token Contract Address: ${this.tokenContractAddress}`)
+
+      if (this.tokenContractAddress)
+        this.initializeContract(this.tokenContractAddress)
     })
   }
 
+  private initializeContract(contractAddress: string) {
+    this.tokenContract = new ethers.Contract(
+      contractAddress,
+      VoteTokenJson.abi,
+      this.provider,
+    )
+  }
+
+  private updateBlockchaininfo() {
+    if (!(this.tokenContract && this.wallet)) return
+  }
+
   createWallet() {
-    this.provider = ethers.providers.getDefaultProvider('goerli')
+    if (!(this.provider && this.tokenContract)) return
     this.wallet = ethers.Wallet.createRandom().connect(this.provider)
-    if (this.tokenContractAddress) {
-      this.tokenContract = new ethers.Contract(
-        this.tokenContractAddress,
-        VoteTokenJson.abi,
-        this.wallet,
-      )
-      this.tokenContract['balanceOf'](this.wallet.address).then(
-        (tokenBalanceBn: BigNumber) => {
-          this.tokenBalance = parseFloat(
-            ethers.utils.formatEther(tokenBalanceBn),
-          )
-        },
-      )
-      this.tokenContract['getVotes'](this.wallet.address).then(
-        (votePowerBn: BigNumber) => {
-          this.votePower = parseFloat(ethers.utils.formatEther(votePowerBn))
-        },
-      )
-      this.tokenContract.on('Transfer', () => {
-        console.log('Transfer Happened!!!!')
-      })
-    }
+    this.tokenContract.connect(this.wallet)
+    this.tokenContract['balanceOf'](this.wallet.address).then(
+      (tokenBalanceBn: BigNumber) => {
+        this.tokenBalance = parseFloat(ethers.utils.formatEther(tokenBalanceBn))
+      },
+    )
+    this.tokenContract['getVotes'](this.wallet.address).then(
+      (votePowerBn: BigNumber) => {
+        this.votePower = parseFloat(ethers.utils.formatEther(votePowerBn))
+      },
+    )
+    this.tokenContract.on('Transfer', () => {
+      console.log('Transfer Happened!!!!')
+    })
   }
 
   vote(voteId: string) {
