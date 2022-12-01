@@ -23,6 +23,7 @@ export class PaymentOrder {
 @Injectable()
 export class AppService {
   provider: ethers.providers.BaseProvider
+  defaultSigner: ethers.Wallet
   erc20ContractFactory: ethers.ContractFactory
   erc20Contract: ethers.Contract
   tokenizedBallotContractFactory: ethers.ContractFactory
@@ -30,6 +31,7 @@ export class AppService {
 
   constructor() {
     this.provider = getProvider()
+    this.defaultSigner = getSigner()
     this.erc20ContractFactory = new ethers.ContractFactory(
       tokenJson.abi,
       tokenJson.bytecode,
@@ -40,12 +42,14 @@ export class AppService {
       tokenizedBallotJson.bytecode,
     )
 
-    this.erc20Contract = this.erc20ContractFactory.attach(
-      process.env.ERC20_VOTE_SOL,
-    )
+    this.erc20Contract = this.erc20ContractFactory
+      .attach(process.env.ERC20_VOTE_SOL)
+      .connect(this.defaultSigner)
 
     this.paymentOrders = []
   }
+
+  //--------------------------- Example ------------------------------
 
   getHello(): string {
     return 'Hello World!'
@@ -57,19 +61,6 @@ export class AppService {
 
   getBlock(hash = 'latest'): Promise<ethers.providers.Block> {
     return this.provider.getBlock(hash)
-  }
-
-  // Get the current total minted supply of an ERC20 token.
-  async getTotalSupply(
-    contractAddress = process.env.ERC20_VOTE_SOL,
-  ): Promise<number> {
-    console.log(`Token contract: ${contractAddress}`)
-    const signer = getSigner()
-    const contractInstance = this.erc20ContractFactory
-      .attach(contractAddress)
-      .connect(signer)
-    const getTotalSupply = await contractInstance.totalSupply()
-    return parseFloat(ethers.utils.formatEther(getTotalSupply))
   }
 
   async getAllowance(
@@ -102,6 +93,20 @@ export class AppService {
     const paymentOrder = this.paymentOrders[id]
     if (secret != paymentOrder.secret) throw new Error('WRONG SECRET')
     return paymentOrder
+  }
+
+  //-----------------------------------------------------------------------------------
+
+  // Get the current total minted supply of an ERC20 token.
+  async getTotalSupply(
+    contractAddress = process.env.ERC20_VOTE_SOL,
+  ): Promise<number> {
+    console.log(`Token contract: ${contractAddress}`)
+    const contract = contractAddress
+      ? this.erc20Contract.attach(contractAddress)
+      : this.erc20Contract
+    const totalSupply = await contract.totalSupply()
+    return parseFloat(ethers.utils.formatEther(totalSupply))
   }
 
   async mintToken(
