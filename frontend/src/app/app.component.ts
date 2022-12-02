@@ -99,6 +99,7 @@ export class AppComponent {
     const provider = new ethers.providers.Web3Provider(window.ethereum, 'any')
     provider.send('eth_requestAccounts', []).then(async () => {
       const account = provider.getSigner()
+      this.signer = provider.getSigner()
       this.accountAddress = await account.getAddress()
       const balance = parseFloat(
         ethers.utils.formatEther(await account.getBalance()),
@@ -118,6 +119,41 @@ export class AppComponent {
   vote(voteId: string) {
     console.log(`Voting for ${voteId}`)
     this.showToast('✅ test', 'message', true)
+  }
+
+  mintToken(amount: string) {
+    if (!this.signer) return
+    this.isRequestTokenButtonEnabled = false
+    const toast: ToastInfo = {
+      header: '⏳ Sending transaction to the blockchain...',
+      body: `Minting ${amount} ${this.tokenSymbol} token.`,
+      autohide: false,
+    }
+    const amountBn = ethers.utils.parseEther(amount)
+    const handleError = (error: any) => {
+      this.showToast(`❌ Error`, error, false)
+      this.isRequestTokenButtonEnabled = true
+    }
+    const onTxComplete = (receipt: ethers.ContractReceipt) => {
+      console.log(receipt.transactionHash)
+      this.toastService.remove(toast)
+      this.updateBlockchainInfo()
+      this.toastService.show(
+        `✅ Successfully minted ${amount} ${this.tokenSymbol}`,
+        `Txn: ${receipt.transactionHash}`,
+        true,
+      )
+    }
+    this.tokenContract
+      ?.connect(this.signer)
+      ['mint'](this.accountAddress, amountBn)
+      .then((tx: ethers.ContractTransaction) => {
+        console.log(tx)
+        this.toastService.toasts.push(toast)
+        tx.wait().then((receipt) => onTxComplete(receipt))
+        return tx
+      })
+      .catch((error: any) => handleError(error))
   }
 
   requestToken(amount: string) {
