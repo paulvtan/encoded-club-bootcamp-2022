@@ -71,7 +71,8 @@
         </button>
       </div>
       <p>Request token</p>
-      <input #tokenId type="number" class="form-control" min="1" placeholder="0" [disabled]="!isRequestTokenButtonEnabled"/>
+      <input #tokenId type="number" class="form-control" min="1" placeholder="0"
+        [disabled]="!isRequestTokenButtonEnabled" />
       <div class="py-3">
         <button (click)="requestToken(tokenId.value)" type="button" class="btn btn-success btn-lg px-4 mx-2"
           [disabled]="!isRequestTokenButtonEnabled">
