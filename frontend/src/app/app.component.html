@@ -130,7 +130,7 @@
               </div>
             </button>
             <button (click)="mintToken(tokenId.value)" type="button" class="btn btn-lg btn-primary mt-3 w-100"
-              [disabled]="!isRequestTokenButtonEnabled">
+              [disabled]="!isRequestTokenButtonEnabled || (signer === undefined)">
               <div *ngIf="isRequestTokenButtonEnabled; else mintingSpinner">
                 Mint Token
               </div>
