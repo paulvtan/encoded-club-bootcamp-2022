@@ -12,9 +12,6 @@
           <button (click)="connectWallet()" type="button" class="btn btn-secondary btn-lg px-4 gap-3">
             Connnect a Wallet
           </button>
-          <button type="button" class="btn btn-info btn-lg px-4 gap-3">
-            Import a wallet
-          </button>
         </div>
       </div>
       <div *ngIf="accountAddress && tokenContractAddress">
@@ -88,7 +85,7 @@
       </div>
     </div>
     <div class="px-4 py-3 my-3 mx-5 text-center">
-      <p>Vote for your favourite proposal</p>
+      <!-- <p>Vote for your favourite proposal</p>
       <div class="input-group mb-3">
         <input #voteId type="number" class="form-control" min="0" [max]="votePower" placeholder="0">
       </div>
@@ -96,16 +93,14 @@
         <button (click)="vote(voteId.value)" type="button" class="btn btn-success btn-lg px-4 mx-2">
           Vote
         </button>
-      </div>
-      <p>Request token</p>
+      </div> -->
+      <h3 class="display-5">Request token</h3>
       <div class="input-group input-group-lg mb-3">
         <span class="input-group-text" id="basic-addon1">
           <i class="bi bi-coin"></i>
         </span>
         <input #tokenId type="number" class="form-control" min="1" placeholder="1" value="1"
           [disabled]="!isRequestTokenButtonEnabled" />
-      </div>
-      <div class="py-3">
         <button (click)="requestToken(tokenId.value)" type="button" class="btn btn-success btn-lg px-4 mx-2"
           [disabled]="!isRequestTokenButtonEnabled">
           <div *ngIf="isRequestTokenButtonEnabled; else mintingSpinner">
