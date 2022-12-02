@@ -1,7 +1,7 @@
 <div class="container py-3">
-  <div class="px-4 py-5 my-5 text-center">
+  <div class="px-4 py-3 my-3 text-center">
     <img class="d-block mx-auto mb-4" src="../assets/metamask.svg" alt="meta mask icon" width="100" height="100" />
-    <h1 class="display-5 fw-bold">Tokenized Ballot</h1>
+    <h1 class="display-5 py-3 fw-bold">Tokenized Ballot</h1>
     <div class="col-lg-6 mx-auto">
       <div *ngIf="!accountAddress">
         <p class="lead mb-4">Choose your connection method</p>
@@ -16,7 +16,9 @@
       </div>
       <div *ngIf="accountAddress && tokenContractAddress">
         <p class="lead mb-4">This is your address: {{ accountAddress }}</p>
-        <p class="lead mb-4">The token contract is: {{ tokenContractAddress }}</p>
+        <p class="lead mb-4">
+          The token contract is: {{ tokenContractAddress }}
+        </p>
       </div>
     </div>
   </div>
@@ -38,6 +40,9 @@
                 </div>
               </ng-template>
             </h1>
+            <button [disabled]="false" type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="">
+              <i class="bi bi-send-fill"></i>
+            </button>
           </div>
         </div>
       </div>
@@ -51,7 +56,8 @@
               <div *ngIf="tokenBalance !== undefined; else tokenBalanceSpinner">
                 <small class="text-muted fw-light">
                   <i class="bi bi-coin"></i>
-                </small> {{ tokenBalance }}
+                </small>
+                {{ tokenBalance }}
               </div>
               <ng-template #tokenBalanceSpinner>
                 <div class="spinner-grow text-success" role="status">
@@ -59,6 +65,10 @@
                 </div>
               </ng-template>
             </h1>
+            <!-- Button trigger modal -->
+            <button [disabled]="!isRequestTokenButtonEnabled" type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+              <i class="bi bi-fuel-pump-fill"></i>
+            </button>
           </div>
         </div>
       </div>
@@ -72,7 +82,8 @@
               <div *ngIf="votePower !== undefined; else votePowerSpinner">
                 <small class="text-muted fw-light">
                   <i class="bi bi-lightning-fill"></i>
-                </small> {{ votePower }}
+                </small>
+                {{ votePower }}
               </div>
               <ng-template #votePowerSpinner>
                 <div class="spinner-grow text-warning" role="status">
@@ -80,42 +91,58 @@
                 </div>
               </ng-template>
             </h1>
+            <button [disabled]="false" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="">
+              <i class="bi bi-ticket-fill"></i>
+            </button>
           </div>
         </div>
       </div>
     </div>
-    <div class="px-4 py-3 my-3 mx-5 text-center">
-      <!-- <p>Vote for your favourite proposal</p>
-      <div class="input-group mb-3">
-        <input #voteId type="number" class="form-control" min="0" [max]="votePower" placeholder="0">
-      </div>
-      <div class="py-3">
-        <button (click)="vote(voteId.value)" type="button" class="btn btn-success btn-lg px-4 mx-2">
-          Vote
-        </button>
-      </div> -->
-      <h3 class="display-5">Request token</h3>
-      <div class="input-group input-group-lg mb-3">
-        <span class="input-group-text" id="basic-addon1">
-          <i class="bi bi-coin"></i>
-        </span>
-        <input #tokenId type="number" class="form-control" min="1" placeholder="1" value="1"
-          [disabled]="!isRequestTokenButtonEnabled" />
-        <button (click)="requestToken(tokenId.value)" type="button" class="btn btn-success btn-lg px-4 mx-2"
-          [disabled]="!isRequestTokenButtonEnabled">
-          <div *ngIf="isRequestTokenButtonEnabled; else mintingSpinner">
-            Request
+    <!-- Modal -->
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+      aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow">
+          <div class="modal-body p-5">
+            <h2 class="fw-bold mb-0">Request Token</h2>
+            <ul class="d-grid gap-4 my-5 list-unstyled">
+              <li class="d-flex gap-4">
+                <h1>
+                  <i class="bi bi-coin"></i>
+                </h1>
+                <div>
+                  <h5 class="mb-0">{{ tokenSymbol }} Token</h5>
+                  You need {{ tokenSymbol }} to take part in the ballot.
+                </div>
+              </li>
+            </ul>
+            <div class="input-group input-group-lg mb-3">
+              <span class="input-group-text" id="basic-addon1">
+                <i class="bi bi-coin"></i>
+              </span>
+              <input #tokenId type="number" class="form-control" min="1" placeholder="1" value="1"
+                [disabled]="!isRequestTokenButtonEnabled" />
+              </div>
+              <button (click)="requestToken(tokenId.value)" type="button" class="btn btn-lg btn-success mt-5 w-100"
+                [disabled]="!isRequestTokenButtonEnabled">
+                <div *ngIf="isRequestTokenButtonEnabled; else mintingSpinner">
+                  Request
+                </div>
+                <ng-template #mintingSpinner>
+                  <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                  Minting...
+                </ng-template>
+              </button>
+            <button type="button" class="btn btn-lg btn-secondary mt-3 w-100" data-bs-dismiss="modal">
+              close
+            </button>
           </div>
-          <ng-template #mintingSpinner>
-            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-            Minting...
-          </ng-template>
-        </button>
+        </div>
       </div>
     </div>
   </div>
   <div class="toast-container position-fixed top-0 end-0 p-3">
     <ngb-toast *ngFor="let toast of toastService.toasts" [header]="toast.header" [autohide]="toast.autohide"
-      (hiddden)="toastService.remove(toast)">{{toast.body}}</ngb-toast>
+      (hiddden)="toastService.remove(toast)">{{ toast.body }}</ngb-toast>
   </div>
 </div>
