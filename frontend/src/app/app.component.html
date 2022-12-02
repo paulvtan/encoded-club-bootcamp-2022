@@ -1,7 +1,7 @@
 <div class="container py-3">
   <div class="px-4 py-5 my-5 text-center">
     <img class="d-block mx-auto mb-4" src="../assets/metamask.svg" alt="meta mask icon" width="100" height="100" />
-    <h1 class="display-5 fw-bold">My Web3 App</h1>
+    <h1 class="display-5 fw-bold">Tokenized Ballot</h1>
     <div class="col-lg-6 mx-auto">
       <div *ngIf="!wallet">
         <p class="lead mb-4">Choose your connection method</p>
@@ -71,7 +71,7 @@
         </button>
       </div>
       <p>Request token</p>
-      <input #tokenId type="number" class="form-control" min="1" placeholder="0"
+      <input #tokenId type="number" class="form-control" min="1" placeholder="1" value="1"
         [disabled]="!isRequestTokenButtonEnabled" />
       <div class="py-3">
         <button (click)="requestToken(tokenId.value)" type="button" class="btn btn-success btn-lg px-4 mx-2"
@@ -86,5 +86,9 @@
         </button>
       </div>
     </div>
+  </div>
+  <div class="toast-container position-fixed top-0 end-0 p-3">
+    <ngb-toast *ngFor="let toast of toastService.toasts" [header]="toast.header" [autohide]="toast.autohide"
+      (hiddden)="toastService.remove(toast)">{{toast.body}}</ngb-toast>
   </div>
 </div>

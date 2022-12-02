@@ -143,6 +143,14 @@ export class AppController {
     }
   }
 
+  @Get('token-symbol/:address')
+  async getTokenSymbol(
+    @Param('address') address: string,
+  ): Promise<{ result: string }> {
+    const tokenSymbol = await this.appService.getTokenSymbol(address)
+    return { result: tokenSymbol }
+  }
+
   @Get('token-balance/:address')
   async getTokenBalance(
     @Param('address') address: string,

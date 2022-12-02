@@ -3,15 +3,15 @@ import { Injectable } from '@angular/core'
 export interface ToastInfo {
   header: string
   body: string
-  delay?: number
+  autohide: boolean
 }
 
 @Injectable({ providedIn: 'root' })
 export class AppToastService {
   toasts: ToastInfo[] = []
 
-  show(header: string, body: string) {
-    this.toasts.push({ header, body })
+  show(header: string, body: string, autohide: boolean) {
+    this.toasts.push({ header, body, autohide })
   }
 
   remove(toast: ToastInfo) {

@@ -134,13 +134,23 @@ export class AppService {
     return receipt.transactionHash
   }
 
+  async getTokenSymbol(
+    contractAddress = process.env.ERC20_VOTE_SOL,
+  ): Promise<string> {
+    const signer = getSigner()
+    const contract = this.erc20ContractFactory
+      .attach(contractAddress)
+      .connect(signer)
+    const symbol = await contract.symbol()
+    return symbol
+  }
+
   async getTokenBalance(address: string) {
     const contractAddress = process.env.ERC20_VOTE_SOL
     const signer = getSigner()
     const contract = this.erc20ContractFactory
       .attach(contractAddress)
       .connect(signer)
-    // const symbol = await contract.symbol()
     const balanceBn = await contract.balanceOf(address)
     const balance = Number(ethers.utils.formatEther(balanceBn))
     return balance
