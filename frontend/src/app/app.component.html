@@ -71,10 +71,17 @@
         </button>
       </div>
       <p>Request token</p>
-      <input #tokenId type="number" class="form-control" min="0" placeholder="0" />
+      <input #tokenId type="number" class="form-control" min="1" placeholder="0" [disabled]="!isRequestTokenButtonEnabled"/>
       <div class="py-3">
-        <button (click)="requestToken(tokenId.value)" type="button" class="btn btn-success btn-lg px-4 mx-2">
-          Request
+        <button (click)="requestToken(tokenId.value)" type="button" class="btn btn-success btn-lg px-4 mx-2"
+          [disabled]="!isRequestTokenButtonEnabled">
+          <div *ngIf="isRequestTokenButtonEnabled; else isLoading">
+            Request
+          </div>
+          <ng-template #isLoading>
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Minting...
+          </ng-template>
         </button>
       </div>
     </div>

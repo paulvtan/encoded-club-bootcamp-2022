@@ -11,6 +11,8 @@ const API_ENDPOINT = 'http://localhost:3000'
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
+  isRequestTokenButtonEnabled = true
+
   wallet: ethers.Wallet | undefined
   provider: ethers.providers.BaseProvider | undefined
 
@@ -55,6 +57,7 @@ export class AppComponent {
         this.votePower = ans.result
         console.log(`Current Vote Power: ${this.votePower}`)
       })
+    this.isRequestTokenButtonEnabled = true
   }
 
   createWallet() {
@@ -73,6 +76,7 @@ export class AppComponent {
   }
 
   requestToken(amount: string) {
+    this.isRequestTokenButtonEnabled = false
     console.log(`Requesting ${amount} token`)
     this.http
       .post<any>(`${API_ENDPOINT}/request-token`, {
