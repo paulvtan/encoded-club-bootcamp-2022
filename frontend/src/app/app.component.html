@@ -3,7 +3,7 @@
     <img class="d-block mx-auto mb-4" src="../assets/metamask.svg" alt="meta mask icon" width="100" height="100" />
     <h1 class="display-5 fw-bold">Tokenized Ballot</h1>
     <div class="col-lg-6 mx-auto">
-      <div *ngIf="!wallet">
+      <div *ngIf="!accountAddress">
         <p class="lead mb-4">Choose your connection method</p>
         <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
           <button (click)="createWallet()" type="button" class="btn btn-primary btn-lg px-4 gap-3">
@@ -17,13 +17,13 @@
           </button>
         </div>
       </div>
-      <div *ngIf="wallet">
-        <p class="lead mb-4">This is your address: {{ wallet.address }}</p>
+      <div *ngIf="accountAddress && tokenContractAddress">
+        <p class="lead mb-4">This is your address: {{ accountAddress }}</p>
         <p class="lead mb-4">The token contract is: {{ tokenContractAddress }}</p>
       </div>
     </div>
   </div>
-  <div *ngIf="wallet">
+  <div *ngIf="accountAddress">
     <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
       <div class="col">
         <div class="card mb-4 rounded-3 shadow-sm">
@@ -32,7 +32,14 @@
           </div>
           <div class="card-body">
             <h1 class="card-title pricing-card-title">
-              <small class="text-muted fw-light">⟠</small> {{ etherBalance }}
+              <div *ngIf="etherBalance !== undefined; else etherBalanceSpinner">
+                <small class="text-muted fw-light">⟠</small> {{ etherBalance }}
+              </div>
+              <ng-template #etherBalanceSpinner>
+                <div class="spinner-grow text-primary" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </ng-template>
             </h1>
           </div>
         </div>
@@ -44,7 +51,16 @@
           </div>
           <div class="card-body">
             <h1 class="card-title pricing-card-title">
-              <small class="text-muted fw-light">🪙</small> {{ tokenBalance }}
+              <div *ngIf="tokenBalance !== undefined; else tokenBalanceSpinner">
+                <small class="text-muted fw-light">
+                  <i class="bi bi-coin"></i>
+                </small> {{ tokenBalance }}
+              </div>
+              <ng-template #tokenBalanceSpinner>
+                <div class="spinner-grow text-success" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </ng-template>
             </h1>
           </div>
         </div>
@@ -56,7 +72,16 @@
           </div>
           <div class="card-body">
             <h1 class="card-title pricing-card-title">
-              <small class="text-muted fw-light">💪</small> {{ votePower }}
+              <div *ngIf="votePower !== undefined; else votePowerSpinner">
+                <small class="text-muted fw-light">
+                  <i class="bi bi-lightning-fill"></i>
+                </small> {{ votePower }}
+              </div>
+              <ng-template #votePowerSpinner>
+                <div class="spinner-grow text-warning" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </ng-template>
             </h1>
           </div>
         </div>
@@ -64,22 +89,29 @@
     </div>
     <div class="px-4 py-3 my-3 mx-5 text-center">
       <p>Vote for your favourite proposal</p>
-      <input #voteId type="number" class="form-control" min="0" [max]="votePower" placeholder="0" />
+      <div class="input-group mb-3">
+        <input #voteId type="number" class="form-control" min="0" [max]="votePower" placeholder="0">
+      </div>
       <div class="py-3">
         <button (click)="vote(voteId.value)" type="button" class="btn btn-success btn-lg px-4 mx-2">
           Vote
         </button>
       </div>
       <p>Request token</p>
-      <input #tokenId type="number" class="form-control" min="1" placeholder="1" value="1"
-        [disabled]="!isRequestTokenButtonEnabled" />
+      <div class="input-group input-group-lg mb-3">
+        <span class="input-group-text" id="basic-addon1">
+          <i class="bi bi-coin"></i>
+        </span>
+        <input #tokenId type="number" class="form-control" min="1" placeholder="1" value="1"
+          [disabled]="!isRequestTokenButtonEnabled" />
+      </div>
       <div class="py-3">
         <button (click)="requestToken(tokenId.value)" type="button" class="btn btn-success btn-lg px-4 mx-2"
           [disabled]="!isRequestTokenButtonEnabled">
-          <div *ngIf="isRequestTokenButtonEnabled; else isLoading">
+          <div *ngIf="isRequestTokenButtonEnabled; else mintingSpinner">
             Request
           </div>
-          <ng-template #isLoading>
+          <ng-template #mintingSpinner>
             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
             Minting...
           </ng-template>

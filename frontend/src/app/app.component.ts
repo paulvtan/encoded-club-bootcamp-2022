@@ -5,7 +5,7 @@ import VoteTokenJson from '../assets/VoteToken.json'
 import { AppToastService, ToastInfo } from './AppToastService'
 import { ExternalProvider } from '@ethersproject/providers'
 
-const API_ENDPOINT = 'http://localhost:3000'
+const API_ENDPOINT = 'http://192.168.68.53:3000'
 
 declare global {
   interface Window {
@@ -25,13 +25,12 @@ export class AppComponent {
   isRequestTokenButtonEnabled = true
 
   accountAddress: string | undefined
-  wallet: ethers.Wallet | undefined
   signer: ethers.providers.JsonRpcSigner | undefined
 
   tokenSymbol: string | undefined
   etherBalance = 0
-  tokenBalance = 0
-  votePower = 0
+  tokenBalance: number | undefined
+  votePower: number | undefined
 
   tokenContractAddress: string | undefined
   tokenContract: ethers.Contract | undefined
@@ -64,16 +63,16 @@ export class AppComponent {
   }
 
   private updateBlockchainInfo() {
-    if (!(this.tokenContract && this.wallet)) return
+    if (!(this.tokenContract && this.accountAddress)) return
     console.log(`Updating blockchain state information.`)
     this.http
-      .get<any>(`${API_ENDPOINT}/token-balance/${this.wallet.address}`)
+      .get<any>(`${API_ENDPOINT}/token-balance/${this.accountAddress}`)
       .subscribe((ans) => {
         this.tokenBalance = ans.result
         console.log(`Current Balance: ${this.tokenBalance}`)
       })
     this.http
-      .get<any>(`${API_ENDPOINT}/vote-balance/${this.wallet.address}`)
+      .get<any>(`${API_ENDPOINT}/vote-balance/${this.accountAddress}`)
       .subscribe((ans) => {
         this.votePower = ans.result
         console.log(`Current Vote Power: ${this.votePower}`)
@@ -86,8 +85,9 @@ export class AppComponent {
     const provider = ethers.providers.getDefaultProvider('goerli')
     this.initializeContract(this.tokenContractAddress, provider)
     if (!this.tokenContract) return
-    this.wallet = ethers.Wallet.createRandom().connect(provider)
-    this.tokenContract.connect(this.wallet)
+    const wallet = ethers.Wallet.createRandom().connect(provider)
+    this.accountAddress = wallet.address
+    this.tokenContract.connect(wallet)
     this.updateBlockchainInfo()
     this.tokenContract.on('Transfer', () => {
       console.log('A token transfer detected')
@@ -97,14 +97,21 @@ export class AppComponent {
 
   connectWallet() {
     const provider = new ethers.providers.Web3Provider(window.ethereum, 'any')
-    if (!provider) return
     provider.send('eth_requestAccounts', []).then(async () => {
       const account = provider.getSigner()
-      const address = await account.getAddress()
+      this.accountAddress = await account.getAddress()
       const balance = parseFloat(
         ethers.utils.formatEther(await account.getBalance()),
       )
-      console.log(balance)
+      this.etherBalance = Math.round(balance * 100) / 100
+      if (!this.tokenContractAddress) return
+      this.initializeContract(this.tokenContractAddress, provider)
+      this.updateBlockchainInfo()
+      if (!this.tokenContract) return
+      this.tokenContract.on('Transfer', () => {
+        console.log('A token transfer detected')
+        this.updateBlockchainInfo()
+      })
     })
   }
 
@@ -124,13 +131,14 @@ export class AppComponent {
     console.log(`Requesting ${amount} token`)
     this.http
       .post<any>(`${API_ENDPOINT}/request-token`, {
-        address: this.wallet?.address,
+        address: this.accountAddress,
         amount: Number(amount),
       })
       .subscribe((ans) => {
         const message = `Success - Txn hash: ${ans.result}`
         console.log(message)
         this.toastService.remove(toast)
+        this.updateBlockchainInfo()
         this.toastService.show(
           `✅ Successfully minted ${amount} ${this.tokenSymbol}`,
           `Txn: ${ans.result}`,
