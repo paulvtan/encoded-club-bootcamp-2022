@@ -3,8 +3,15 @@ import { Component } from '@angular/core'
 import { ethers } from 'ethers'
 import VoteTokenJson from '../assets/VoteToken.json'
 import { AppToastService, ToastInfo } from './AppToastService'
+import { ExternalProvider } from '@ethersproject/providers'
 
 const API_ENDPOINT = 'http://localhost:3000'
+
+declare global {
+  interface Window {
+    ethereum: ExternalProvider
+  }
+}
 
 @Component({
   selector: 'app-root',
@@ -17,8 +24,9 @@ export class AppComponent {
 
   isRequestTokenButtonEnabled = true
 
+  accountAddress: string | undefined
   wallet: ethers.Wallet | undefined
-  provider: ethers.providers.BaseProvider | undefined
+  signer: ethers.providers.JsonRpcSigner | undefined
 
   tokenSymbol: string | undefined
   etherBalance = 0
@@ -29,13 +37,9 @@ export class AppComponent {
   tokenContract: ethers.Contract | undefined
 
   constructor(private http: HttpClient) {
-    this.provider = ethers.providers.getDefaultProvider('goerli')
     this.http.get<any>(`${API_ENDPOINT}/token-address`).subscribe((ans) => {
       this.tokenContractAddress = ans.result
       console.log(`Token Contract Address: ${this.tokenContractAddress}`)
-
-      if (this.tokenContractAddress)
-        this.initializeContract(this.tokenContractAddress)
     })
   }
 
@@ -43,11 +47,14 @@ export class AppComponent {
     this.toastService.show(header, body, autohide)
   }
 
-  private initializeContract(contractAddress: string) {
+  private initializeContract(
+    contractAddress: string,
+    provider: ethers.providers.BaseProvider,
+  ) {
     this.tokenContract = new ethers.Contract(
       contractAddress,
       VoteTokenJson.abi,
-      this.provider,
+      provider,
     )
     this.http
       .get<any>(`${API_ENDPOINT}/token-symbol/${this.tokenContractAddress}`)
@@ -75,13 +82,29 @@ export class AppComponent {
   }
 
   createWallet() {
-    if (!(this.provider && this.tokenContract)) return
-    this.wallet = ethers.Wallet.createRandom().connect(this.provider)
+    if (!this.tokenContractAddress) return
+    const provider = ethers.providers.getDefaultProvider('goerli')
+    this.initializeContract(this.tokenContractAddress, provider)
+    if (!this.tokenContract) return
+    this.wallet = ethers.Wallet.createRandom().connect(provider)
     this.tokenContract.connect(this.wallet)
     this.updateBlockchainInfo()
     this.tokenContract.on('Transfer', () => {
       console.log('A token transfer detected')
       this.updateBlockchainInfo()
+    })
+  }
+
+  connectWallet() {
+    const provider = new ethers.providers.Web3Provider(window.ethereum, 'any')
+    if (!provider) return
+    provider.send('eth_requestAccounts', []).then(async () => {
+      const account = provider.getSigner()
+      const address = await account.getAddress()
+      const balance = parseFloat(
+        ethers.utils.formatEther(await account.getBalance()),
+      )
+      console.log(balance)
     })
   }
 
