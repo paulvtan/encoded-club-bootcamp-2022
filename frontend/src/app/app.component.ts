@@ -13,6 +13,11 @@ declare global {
   }
 }
 
+export interface Proposal {
+  name: string
+  voteCount: number
+}
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -21,6 +26,7 @@ declare global {
 export class AppComponent {
   title = 'Tokenized Ballot'
   toastService = new AppToastService()
+  proposals: Proposal[] | undefined
 
   isSendingTransaction = false
 
@@ -100,6 +106,7 @@ export class AppComponent {
       console.log('A token transfer detected')
       this.updateBlockchainInfo()
     })
+    this.getProposals()
   }
 
   connectWallet() {
@@ -127,10 +134,11 @@ export class AppComponent {
   getProposals() {
     this.http.get<any>(`${API_ENDPOINT}/get-proposals`).subscribe((ans) => {
       console.log(ans.result)
+      this.proposals = ans.result
     })
   }
 
-  vote(voteId: string) {
+  vote(voteId: number) {
     console.log(`Voting for ${voteId}`)
     this.showToast('✅ test', 'message', true)
   }
