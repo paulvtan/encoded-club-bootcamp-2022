@@ -40,7 +40,7 @@
                 </div>
               </ng-template>
             </h1>
-            <button [disabled]="(etherBalance === 0)" type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="">
+            <button [disabled]="true" type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="">
               <i class="bi bi-send-fill"></i>
             </button>
           </div>
@@ -66,7 +66,7 @@
               </ng-template>
             </h1>
             <!-- Button trigger modal -->
-            <button [disabled]="(tokenBalance === undefined) || !isRequestTokenButtonEnabled" type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+            <button [disabled]="(tokenBalance === undefined) || isSendingTransaction" type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
               <i class="bi bi-fuel-pump-fill"></i>
             </button>
           </div>
@@ -91,7 +91,7 @@
                 </div>
               </ng-template>
             </h1>
-            <button [disabled]="(votePower === undefined)" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="">
+            <button (click)="selfDelegate()" [disabled]="(votePower === undefined) || isSendingTransaction" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="">
               <i class="bi bi-ticket-fill"></i>
             </button>
           </div>
@@ -121,17 +121,17 @@
                 <i class="bi bi-coin"></i>
               </span>
               <input #tokenId type="number" class="form-control" min="1" placeholder="1" value="1"
-                [disabled]="!isRequestTokenButtonEnabled" />
+                [disabled]="isSendingTransaction" />
             </div>
             <button (click)="requestToken(tokenId.value)" type="button" class="btn btn-lg btn-success mt-5 w-100"
-              [disabled]="!isRequestTokenButtonEnabled">
-              <div *ngIf="isRequestTokenButtonEnabled; else mintingSpinner">
+              [disabled]="isSendingTransaction">
+              <div *ngIf="!isSendingTransaction; else mintingSpinner">
                 Request Token
               </div>
             </button>
             <button (click)="mintToken(tokenId.value)" type="button" class="btn btn-lg btn-primary mt-3 w-100"
-              [disabled]="!isRequestTokenButtonEnabled || (signer === undefined)">
-              <div *ngIf="isRequestTokenButtonEnabled; else mintingSpinner">
+              [disabled]="isSendingTransaction || (signer === undefined)">
+              <div *ngIf="!isSendingTransaction; else mintingSpinner">
                 Mint Token
               </div>
             </button>

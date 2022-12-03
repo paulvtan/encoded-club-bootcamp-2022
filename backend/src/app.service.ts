@@ -3,6 +3,7 @@ import { ethers } from 'ethers'
 import { getProvider, getSigner } from './Helper'
 import * as tokenJson from './assets/VoteToken.json'
 import * as tokenizedBallotJson from './assets/TokenizedBallot.json'
+import { sign } from 'crypto'
 
 export class CreatePaymentOrderDto {
   value: number
@@ -23,6 +24,11 @@ export class PaymentOrder {
 export class RequestTokenDto {
   address: string
   amount: number
+}
+
+export class Proposal {
+  name: string
+  voteCount: number
 }
 
 @Injectable()
@@ -104,6 +110,10 @@ export class AppService {
 
   getTokenAddress(): string {
     return process.env.ERC20_VOTE_SOL
+  }
+
+  getTokenizedBallotAddress(): string {
+    return process.env.TOKENIZED_BALLOT_SOL
   }
 
   // Get the current total minted supply of an ERC20 token.
@@ -217,6 +227,39 @@ export class AppService {
     const nameFormatted = ethers.utils.parseBytes32String(name)
     const voteCountFormatted = ethers.utils.formatEther(voteCount)
     return `Name: ${nameFormatted}\nVote: ${voteCountFormatted}`
+  }
+
+  async getProposalCount() {
+    const signer = getSigner()
+    const contractAddress = process.env.TOKENIZED_BALLOT_SOL
+    console.log(
+      `Getting number of proposals in tokenized ballot: ${contractAddress}`,
+    )
+    const contract = this.tokenizedBallotContractFactory
+      .attach(contractAddress)
+      .connect(signer)
+    const count = Number(await contract.getProposalsCount())
+    console.log(`${count} proposals found.`)
+    return count
+  }
+
+  async getProposals() {
+    const contractAddress = process.env.TOKENIZED_BALLOT_SOL
+    const proposalCount = await this.getProposalCount()
+    const proposals: Proposal[] = []
+    console.log(`Using tokenized ballot contract: ${contractAddress}`)
+    const signer = getSigner()
+    const contract = this.tokenizedBallotContractFactory
+      .attach(contractAddress)
+      .connect(signer)
+    for (let i = 0; i < proposalCount; i++) {
+      const proposalRaw = await contract.proposals(i)
+      const proposal = new Proposal()
+      proposal.name = ethers.utils.parseBytes32String(proposalRaw.name)
+      proposal.voteCount = Number(proposalRaw.voteCount)
+      proposals.push(proposal)
+    }
+    return proposals
   }
 
   async getWinner(contractAddress = process.env.TOKENIZED_BALLOT_SOL) {

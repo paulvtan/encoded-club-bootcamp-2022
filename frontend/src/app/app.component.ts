@@ -22,7 +22,7 @@ export class AppComponent {
   title = 'Tokenized Ballot'
   toastService = new AppToastService()
 
-  isRequestTokenButtonEnabled = true
+  isSendingTransaction = false
 
   accountAddress: string | undefined
   signer: ethers.providers.JsonRpcSigner | undefined
@@ -33,12 +33,19 @@ export class AppComponent {
   votePower: number | undefined
 
   tokenContractAddress: string | undefined
+  tokenizedBallotContractAddress: string | undefined
   tokenContract: ethers.Contract | undefined
 
   constructor(private http: HttpClient) {
     this.http.get<any>(`${API_ENDPOINT}/token-address`).subscribe((ans) => {
       this.tokenContractAddress = ans.result
       console.log(`Token Contract Address: ${this.tokenContractAddress}`)
+    })
+    this.http.get<any>(`${API_ENDPOINT}/ballot-address`).subscribe((ans) => {
+      this.tokenizedBallotContractAddress = ans.result
+      console.log(
+        `Tokenized Ballot Contract Address: ${this.tokenizedBallotContractAddress}`,
+      )
     })
   }
 
@@ -77,7 +84,7 @@ export class AppComponent {
         this.votePower = ans.result
         console.log(`Current Vote Power: ${this.votePower}`)
       })
-    this.isRequestTokenButtonEnabled = true
+    this.isSendingTransaction = false
   }
 
   createWallet() {
@@ -114,6 +121,13 @@ export class AppComponent {
         this.updateBlockchainInfo()
       })
     })
+    this.getProposals()
+  }
+
+  getProposals() {
+    this.http.get<any>(`${API_ENDPOINT}/get-proposals`).subscribe((ans) => {
+      console.log(ans.result)
+    })
   }
 
   vote(voteId: string) {
@@ -123,7 +137,7 @@ export class AppComponent {
 
   mintToken(amount: string) {
     if (!this.signer) return
-    this.isRequestTokenButtonEnabled = false
+    this.isSendingTransaction = true
     const toast: ToastInfo = {
       header: '⏳ Sending transaction to the blockchain...',
       body: `Minting ${amount} ${this.tokenSymbol} token.`,
@@ -132,7 +146,7 @@ export class AppComponent {
     const amountBn = ethers.utils.parseEther(amount)
     const handleError = (error: any) => {
       this.showToast(`❌ Error`, error, false)
-      this.isRequestTokenButtonEnabled = true
+      this.isSendingTransaction = false
     }
     const onTxComplete = (receipt: ethers.ContractReceipt) => {
       console.log(receipt.transactionHash)
@@ -157,14 +171,14 @@ export class AppComponent {
   }
 
   requestToken(amount: string) {
-    this.isRequestTokenButtonEnabled = false
+    console.log(`Requesting ${amount} token`)
+    this.isSendingTransaction = true
     const toast: ToastInfo = {
       header: '⏳ Sending transaction to the blockchain...',
       body: `Requesting ${amount} ${this.tokenSymbol} token.`,
       autohide: false,
     }
     this.toastService.toasts.push(toast)
-    console.log(`Requesting ${amount} token`)
     this.http
       .post<any>(`${API_ENDPOINT}/request-token`, {
         address: this.accountAddress,
@@ -181,5 +195,40 @@ export class AppComponent {
           true,
         )
       })
+  }
+
+  selfDelegate() {
+    if (!this.signer) return
+    console.log(`Self-delegating voting power.`)
+    this.isSendingTransaction = true
+    const toast: ToastInfo = {
+      header: '⏳ Sending transaction to the blockchain...',
+      body: `Self-delegating the voting power.`,
+      autohide: false,
+    }
+    const handleError = (error: any) => {
+      this.showToast(`❌ Error`, error, false)
+      this.isSendingTransaction = false
+    }
+    const onTxComplete = (receipt: ethers.ContractReceipt) => {
+      console.log(receipt.transactionHash)
+      this.toastService.remove(toast)
+      this.updateBlockchainInfo()
+      this.toastService.show(
+        `✅ Successfully self-delegated voting power.`,
+        `Txn: ${receipt.transactionHash}`,
+        true,
+      )
+    }
+    this.tokenContract
+      ?.connect(this.signer)
+      ['delegate'](this.accountAddress)
+      .then((tx: ethers.ContractTransaction) => {
+        this.toastService.toasts.push(toast)
+        console.log(tx)
+        tx.wait().then((receipt) => onTxComplete(receipt))
+        return tx
+      })
+      .catch((error: any) => handleError(error))
   }
 }

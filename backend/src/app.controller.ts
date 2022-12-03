@@ -52,11 +52,6 @@ export class AppController {
     return this.appService.getBlock(hash)
   }
 
-  @Get('token-address')
-  getTokenAddress() {
-    return { result: this.appService.getTokenAddress() }
-  }
-
   @Get('total-supply')
   @ApiQuery({ name: 'address', required: false })
   getTotalSupply(@Query('address') address: string) {
@@ -133,14 +128,24 @@ export class AppController {
 
   // -------------------------- Used by frontend ------------------------------
 
-  @Post('request-token')
-  async requestToken(
-    @Body() body: RequestTokenDto,
-  ): Promise<{ result: string }> {
-    const txHash = await this.appService.mintToken(body.address, body.amount)
-    return {
-      result: txHash,
-    }
+  @Get('token-address')
+  getTokenAddress() {
+    return { result: this.appService.getTokenAddress() }
+  }
+
+  @Get('ballot-address')
+  getTokenizedBallotAddress() {
+    return { result: this.appService.getTokenizedBallotAddress() }
+  }
+
+  @Get('get-proposal-count')
+  async getProposalCount() {
+    return { result: await this.appService.getProposalCount() }
+  }
+
+  @Get('get-proposals')
+  async getProposals() {
+    return { result: await this.appService.getProposals() }
   }
 
   @Get('token-symbol/:address')
@@ -165,5 +170,15 @@ export class AppController {
   ): Promise<{ result: number }> {
     const voteBalance = await this.appService.getVoteBalance(address)
     return { result: voteBalance }
+  }
+
+  @Post('request-token')
+  async requestToken(
+    @Body() body: RequestTokenDto,
+  ): Promise<{ result: string }> {
+    const txHash = await this.appService.mintToken(body.address, body.amount)
+    return {
+      result: txHash,
+    }
   }
 }

@@ -19,7 +19,7 @@ async function main() {
 
   // Make sure you've deployed your vote token contract first.
   const tokenContract = await getContractAddressByName("ERC20Votes.sol")
-  // Snapshot current block number - Any manipulation of VoteToken after contract deployment doesn't count.
+  // Snapshot current block number - Any manipulation of VoteToken after contract deployment doesn't count. 7151 is roughly 24 hours. (Vote closing 24 hours after)
   const targetBlockNumber = (await getLatestBlock()).number
   const proposals = process.argv.slice(2)
   console.log(`Snapshot taken at the current blocknumber: ${targetBlockNumber}`)

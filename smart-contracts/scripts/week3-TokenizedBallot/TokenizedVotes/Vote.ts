@@ -11,7 +11,7 @@ import {
 dotenv.config()
 
 // This script spent your voting power to vote for specified proposal number.
-// example: yarn run ts-node --files .\scripts\week3\TokenizedVotes\Vote.ts "2" "100"
+// example: yarn run ts-node --files .\scripts\week3-TokenizedBallot\TokenizedVotes\Vote.ts "2" "100"
 async function main() {
   const contractAddress =
     process.argv[4] ?? (await getContractAddressByName("TokenizedBallot.sol"))
