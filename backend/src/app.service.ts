@@ -246,20 +246,30 @@ export class AppService {
   async getProposals() {
     const contractAddress = process.env.TOKENIZED_BALLOT_SOL
     const proposalCount = await this.getProposalCount()
-    const proposals: Proposal[] = []
     console.log(`Using tokenized ballot contract: ${contractAddress}`)
     const signer = getSigner()
     const contract = this.tokenizedBallotContractFactory
       .attach(contractAddress)
       .connect(signer)
-    for (let i = 0; i < proposalCount; i++) {
-      const proposalRaw = await contract.proposals(i)
-      const proposal = new Proposal()
-      proposal.name = ethers.utils.parseBytes32String(proposalRaw.name)
-      proposal.voteCount = Number(proposalRaw.voteCount)
-      proposals.push(proposal)
+    const proposals: Proposal[] = [
+      this.formatProposal(await contract.proposals(0)),
+    ]
+    for (let i = 1; i < proposalCount; i++) {
+      const proposal = this.formatProposal(await contract.proposals(i))
+      if (proposal.voteCount <= proposals[i - 1].voteCount) {
+        proposals.push(proposal)
+      } else {
+        proposals.splice(i - 1, 0, proposal)
+      }
     }
     return proposals
+  }
+
+  formatProposal(proposalRaw: { name: string; voteCount: number }): Proposal {
+    const proposal = new Proposal()
+    proposal.name = ethers.utils.parseBytes32String(proposalRaw.name)
+    proposal.voteCount = Number(ethers.utils.formatEther(proposalRaw.voteCount))
+    return proposal
   }
 
   async getWinner(contractAddress = process.env.TOKENIZED_BALLOT_SOL) {

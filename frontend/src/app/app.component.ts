@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http'
 import { Component } from '@angular/core'
 import { ethers } from 'ethers'
 import VoteTokenJson from '../assets/VoteToken.json'
+import TokenizedBallotJson from '../assets/TokenizedBallot.json'
 import { AppToastService, ToastInfo } from './AppToastService'
 import { ExternalProvider } from '@ethersproject/providers'
 
@@ -41,6 +42,7 @@ export class AppComponent {
   tokenContractAddress: string | undefined
   tokenizedBallotContractAddress: string | undefined
   tokenContract: ethers.Contract | undefined
+  tokenizedBallotContract: ethers.Contract | undefined
 
   constructor(private http: HttpClient) {
     this.http.get<any>(`${API_ENDPOINT}/token-address`).subscribe((ans) => {
@@ -59,13 +61,17 @@ export class AppComponent {
     this.toastService.show(header, body, autohide)
   }
 
-  private initializeContract(
-    contractAddress: string,
-    provider: ethers.providers.BaseProvider,
-  ) {
+  private initializeContract(provider: ethers.providers.BaseProvider) {
+    if (!(this.tokenContractAddress && this.tokenizedBallotContractAddress))
+      return
     this.tokenContract = new ethers.Contract(
-      contractAddress,
+      this.tokenContractAddress,
       VoteTokenJson.abi,
+      provider,
+    )
+    this.tokenizedBallotContract = new ethers.Contract(
+      this.tokenizedBallotContractAddress,
+      TokenizedBallotJson.abi,
       provider,
     )
     this.http
@@ -85,18 +91,21 @@ export class AppComponent {
         console.log(`Current Balance: ${this.tokenBalance}`)
       })
     this.http
-      .get<any>(`${API_ENDPOINT}/vote-balance/${this.accountAddress}`)
+      .get<any>(
+        `${API_ENDPOINT}/check-vote-power?contractAddress=${this.tokenizedBallotContractAddress}&address=${this.accountAddress}`,
+      )
       .subscribe((ans) => {
         this.votePower = ans.result
         console.log(`Current Vote Power: ${this.votePower}`)
       })
+    this.getProposals()
     this.isSendingTransaction = false
   }
 
   createWallet() {
     if (!this.tokenContractAddress) return
     const provider = ethers.providers.getDefaultProvider('goerli')
-    this.initializeContract(this.tokenContractAddress, provider)
+    this.initializeContract(provider)
     if (!this.tokenContract) return
     const wallet = ethers.Wallet.createRandom().connect(provider)
     this.accountAddress = wallet.address
@@ -106,7 +115,6 @@ export class AppComponent {
       console.log('A token transfer detected')
       this.updateBlockchainInfo()
     })
-    this.getProposals()
   }
 
   connectWallet() {
@@ -120,7 +128,7 @@ export class AppComponent {
       )
       this.etherBalance = Math.round(balance * 100) / 100
       if (!this.tokenContractAddress) return
-      this.initializeContract(this.tokenContractAddress, provider)
+      this.initializeContract(provider)
       this.updateBlockchainInfo()
       if (!this.tokenContract) return
       this.tokenContract.on('Transfer', () => {
@@ -128,7 +136,6 @@ export class AppComponent {
         this.updateBlockchainInfo()
       })
     })
-    this.getProposals()
   }
 
   getProposals() {
@@ -139,8 +146,39 @@ export class AppComponent {
   }
 
   vote(voteId: number) {
+    if (!this.signer) return
+    this.isSendingTransaction = true
     console.log(`Voting for ${voteId}`)
-    this.showToast('✅ test', 'message', true)
+    const toast: ToastInfo = {
+      header: '⏳ Sending transaction to the blockchain...',
+      body: `Voting for proposal ${voteId + 1}.`,
+      autohide: false,
+    }
+    const handleError = (error: any) => {
+      this.showToast(`❌ Error`, error, false)
+      this.isSendingTransaction = false
+    }
+    const onTxComplete = (receipt: ethers.ContractReceipt) => {
+      console.log(receipt.transactionHash)
+      this.toastService.remove(toast)
+      this.updateBlockchainInfo()
+      this.toastService.show(
+        `✅ Successfully voted for proporsal ${voteId + 1}`,
+        `Txn: ${receipt.transactionHash}`,
+        true,
+      )
+    }
+    const amountBn = ethers.utils.parseEther('1')
+    this.tokenizedBallotContract
+      ?.connect(this.signer)
+      ['vote'](voteId, amountBn)
+      .then((tx: ethers.ContractTransaction) => {
+        console.log(tx)
+        this.toastService.toasts.push(toast)
+        tx.wait().then((receipt) => onTxComplete(receipt))
+        return tx
+      })
+      .catch((error: any) => handleError(error))
   }
 
   mintToken(amount: string) {

@@ -58,16 +58,6 @@ export class AppController {
     return this.appService.getTotalSupply(address)
   }
 
-  // Check account voting power on a particular TokenizedBallot contract, leave blank to use default.
-  @Get('check-vote-power')
-  @ApiQuery({ name: 'contractAddress', required: false })
-  checkVote(
-    @Query('contractAddress') contractAddress: string,
-    @Query('address') address: string,
-  ): Promise<string> {
-    return this.appService.checkVotePower(contractAddress, address)
-  }
-
   @Get('get-proposal')
   @ApiQuery({ name: 'contractAddress', required: false })
   getProposal(
@@ -170,6 +160,21 @@ export class AppController {
   ): Promise<{ result: number }> {
     const voteBalance = await this.appService.getVoteBalance(address)
     return { result: voteBalance }
+  }
+
+  // Check account voting power on a particular TokenizedBallot contract, leave blank to use default.
+  @Get('check-vote-power')
+  @ApiQuery({ name: 'contractAddress', required: false })
+  async checkVote(
+    @Query('contractAddress') contractAddress: string,
+    @Query('address') address: string,
+  ): Promise<{ result: string }> {
+    const votePower = Number(
+      await this.appService.checkVotePower(contractAddress, address),
+    ).toFixed(0)
+    return {
+      result: votePower,
+    }
   }
 
   @Post('request-token')
