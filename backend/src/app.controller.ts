@@ -1,6 +1,6 @@
-import { Controller, Get, Param, Post, Query } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common'
 import { ApiQuery } from '@nestjs/swagger'
-import { AppService } from './app.service'
+import { AppService, RequestTokenDto } from './app.service'
 
 @Controller()
 export class AppController {
@@ -35,7 +35,7 @@ export class AppController {
   //   return this.appService.requestPaymentOrder(body.id, body.secret)
   // }
 
-  //---------------------------------------------------------------------------
+  //----------------------- For initial Swagger UI experiment -----------------------------
 
   @Get('hello')
   getHello(): string {
@@ -52,24 +52,10 @@ export class AppController {
     return this.appService.getBlock(hash)
   }
 
-  @Get('total-supply/:address')
-  getTotalSupply(@Param('address') address: string) {
+  @Get('total-supply')
+  @ApiQuery({ name: 'address', required: false })
+  getTotalSupply(@Query('address') address: string) {
     return this.appService.getTotalSupply(address)
-  }
-
-  @Get('balance/:address')
-  getBalance(@Param('address') address: string): Promise<string> {
-    return this.appService.getBalance(address)
-  }
-
-  // Check account voting power on a particular TokenizedBallot contract, leave blank to use default.
-  @Get('check-vote-power')
-  @ApiQuery({ name: 'contractAddress', required: false })
-  checkVote(
-    @Query('contractAddress') contractAddress: string,
-    @Query('address') address: string,
-  ): Promise<string> {
-    return this.appService.checkVotePower(contractAddress, address)
   }
 
   @Get('get-proposal')
@@ -107,10 +93,10 @@ export class AppController {
     @Query('amount') amount: number,
   ) {
     return this.appService.mintToken(
-      contractAddress,
-      minterAccountIndex,
       receiverAddress,
       amount,
+      minterAccountIndex,
+      contractAddress,
     )
   }
 
@@ -128,5 +114,76 @@ export class AppController {
     @Query('amount') amount: number,
   ) {
     return this.appService.vote(contractAddress, proposalIndex, amount)
+  }
+
+  // -------------------------- Used by frontend ------------------------------
+
+  @Get('token-address')
+  getTokenAddress() {
+    return { result: this.appService.getTokenAddress() }
+  }
+
+  @Get('ballot-address')
+  getTokenizedBallotAddress() {
+    return { result: this.appService.getTokenizedBallotAddress() }
+  }
+
+  @Get('get-proposal-count')
+  async getProposalCount() {
+    return { result: await this.appService.getProposalCount() }
+  }
+
+  @Get('get-proposals')
+  async getProposals() {
+    return { result: await this.appService.getProposals() }
+  }
+
+  @Get('token-symbol/:address')
+  async getTokenSymbol(
+    @Param('address') address: string,
+  ): Promise<{ result: string }> {
+    const tokenSymbol = await this.appService.getTokenSymbol(address)
+    return { result: tokenSymbol }
+  }
+
+  @Get('token-balance/:address')
+  async getTokenBalance(
+    @Param('address') address: string,
+  ): Promise<{ result: number }> {
+    const tokenBalance = await this.appService.getTokenBalance(address)
+    return { result: tokenBalance }
+  }
+
+  @Get('vote-balance/:address')
+  async getVoteBalance(
+    @Param('address') address: string,
+  ): Promise<{ result: number }> {
+    const voteBalance = await this.appService.getVoteBalance(address)
+    return { result: voteBalance }
+  }
+
+  // Check account voting power on a particular TokenizedBallot contract, leave blank to use default.
+  @Get('check-vote-power')
+  @ApiQuery({ name: 'contractAddress', required: false })
+  async checkVote(
+    @Query('contractAddress') contractAddress: string,
+    @Query('address') address: string,
+  ): Promise<{ result: string }> {
+    const votePower = Number(
+      await this.appService.checkVotePower(contractAddress, address),
+    ).toFixed(0)
+    return {
+      result: votePower,
+    }
+  }
+
+  @Post('request-token')
+  async requestToken(
+    @Body() body: RequestTokenDto,
+  ): Promise<{ result: string }> {
+    const txHash = await this.appService.mintToken(body.address, body.amount)
+    return {
+      result: txHash,
+    }
   }
 }

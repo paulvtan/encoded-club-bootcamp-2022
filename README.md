@@ -11,15 +11,40 @@ to learn Solidity and blockchain from scratch!
 [Solidyt Bootcamp 2022 by Encoded Club](https://www.encode.club/solidity-bootcamps)
 
 # Content
-## Week 1 - HelloWorld.sol
+- Introduction
+- Building HelloWorld.sol in Remix
+- Syntax and structure
+- Interfaces and external calls
+- Weekend Project 1
+- Vscode setup and code quality
+- Building unit tests for HelloWorld.sol
+- Coding Ballot.sol
+- Scripts for Ballot.sol and events
+- Weekend Project 2
+- MyERC20.sol and MyERC721.sol
+- TokenSale.sol
+- Tests and scripts for TokenSale.sol
+- Tokenized Votes
+- Weekend Project 3
+- NodeJS API using NestJS framework
+- Minting tokens in the backend
+- Frontend
+- Integration
+- Weekend Project 4
+- Sponsor Week
+- Introduction to gas optimization and smart contract security
+- Gas limit and loops
+- Randomness
+- Lottery
+- Weekend Project 5
+- Part 1: Blockchain scaling solutions
+- Part 2: Solidity advanced content
+- DeFi
+- Upgradeability patterns
+- Part 1: IPFS
+- Part 2: Smart Contract Security
+- Team Projects
 
-## Week 2 - Ballot.sol
-
-## Week 3 - TokenizedBallot.sol
-- ERC20
-- Role Based Access Control
-
-## Week 4 - Frontend & Backend
 # Quick Start Guide
 
 ```

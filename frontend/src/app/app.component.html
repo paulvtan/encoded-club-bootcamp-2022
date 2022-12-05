@@ -1,1 +1,197 @@
-<p>Hello World</p>
+<div class="container py-3">
+  <div class="px-4 py-3 my-3 text-center">
+    <img class="d-block mx-auto mb-4" src="../assets/metamask.svg" alt="meta mask icon" width="100" height="100" />
+    <h1 class="display-5 py-3 fw-bold">Tokenized Ballot</h1>
+    <div class="col-lg-6 mx-auto">
+      <div *ngIf="!accountAddress">
+        <p class="lead mb-4">Choose your connection method</p>
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+          <button (click)="createWallet()" type="button" class="btn btn-primary btn-lg px-4 gap-3">
+            Create a Wallet
+          </button>
+          <button (click)="connectWallet()" type="button" class="btn btn-secondary btn-lg px-4 gap-3">
+            Connnect a Wallet
+          </button>
+        </div>
+      </div>
+      <div *ngIf="accountAddress && tokenContractAddress">
+        <figure class="text-center">
+          <blockquote class="blockquote">
+            <p>This is your address</p>
+          </blockquote>
+          <figcaption class="blockquote-footer">
+            {{ accountAddress }}
+          </figcaption>
+        </figure>
+        <figure class="text-center">
+          <blockquote class="blockquote">
+            <p>The token contract is</p>
+          </blockquote>
+          <figcaption class="blockquote-footer">
+            {{ tokenContractAddress }}
+          </figcaption>
+        </figure>
+        <figure class="text-center">
+          <blockquote class="blockquote">
+            <p>The tokenized ballot contract is</p>
+          </blockquote>
+          <figcaption class="blockquote-footer">
+            {{ tokenizedBallotContractAddress }}
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="accountAddress">
+    <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
+      <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm">
+          <div class="card-header py-3">
+            <h4 class="my-0 fw-normal">Ether Balance</h4>
+          </div>
+          <div class="card-body">
+            <h1 class="card-title pricing-card-title">
+              <div *ngIf="etherBalance !== undefined; else etherBalanceSpinner">
+                <small class="text-muted fw-light">⟠</small> {{ etherBalance }}
+              </div>
+              <ng-template #etherBalanceSpinner>
+                <div class="spinner-grow text-primary" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </ng-template>
+            </h1>
+            <button [disabled]="true" type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="">
+              <i class="bi bi-send-fill"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm">
+          <div class="card-header py-3">
+            <h4 class="my-0 fw-normal">Token Balance</h4>
+          </div>
+          <div class="card-body">
+            <h1 class="card-title pricing-card-title">
+              <div *ngIf="tokenBalance !== undefined; else tokenBalanceSpinner">
+                <small class="text-muted fw-light">
+                  <i class="bi bi-coin"></i>
+                </small>
+                {{ tokenBalance }}
+              </div>
+              <ng-template #tokenBalanceSpinner>
+                <div class="spinner-grow text-success" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </ng-template>
+            </h1>
+            <!-- Button trigger modal -->
+            <button [disabled]="(tokenBalance === undefined) || isSendingTransaction" type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+              <i class="bi bi-fuel-pump-fill"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm border-primary">
+          <div class="card-header py-3 text-bg-primary border-primary">
+            <h4 class="my-0 fw-normal">Voting Power</h4>
+          </div>
+          <div class="card-body">
+            <h1 class="card-title pricing-card-title">
+              <div *ngIf="votePower !== undefined; else votePowerSpinner">
+                <small class="text-muted fw-light">
+                  <i class="bi bi-lightning-fill"></i>
+                </small>
+                {{ votePower }}
+              </div>
+              <ng-template #votePowerSpinner>
+                <div class="spinner-grow text-warning" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </ng-template>
+            </h1>
+            <button (click)="selfDelegate()" [disabled]="(votePower === undefined) || isSendingTransaction" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="">
+              <i class="bi bi-ticket-fill"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <table class="table table-striped" *ngIf="proposals !== undefined">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Score</th>
+            <th scope="col">Vote</th>
+          </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let proposal of proposals; index as i">
+              <th scope="row">{{ i + 1 }}</th>
+              <td>
+                {{ proposal.name }}
+              </td>
+              <td>{{ proposal.voteCount | number }}</td>
+              <td>
+                <button (click)="vote(i)" [disabled]="(tokenBalance === undefined) || isSendingTransaction" type="button" class="btn btn-outline-secondary">
+                  <i class="bi bi-hand-thumbs-up-fill"></i>
+                </button>
+              </td>
+            </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+      aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow">
+          <div class="modal-body p-5">
+            <h2 class="fw-bold mb-0">Request Token</h2>
+            <ul class="d-grid gap-4 my-5 list-unstyled">
+              <li class="d-flex gap-4">
+                <h1>
+                  <i class="bi bi-coin"></i>
+                </h1>
+                <div>
+                  <h5 class="mb-0">{{ tokenSymbol }} Token</h5>
+                  You need {{ tokenSymbol }} to take part in the ballot.
+                </div>
+              </li>
+            </ul>
+            <div class="input-group input-group-lg mb-3">
+              <span class="input-group-text" id="basic-addon1">
+                <i class="bi bi-coin"></i>
+              </span>
+              <input #tokenId type="number" class="form-control" min="1" placeholder="1" value="1"
+                [disabled]="isSendingTransaction" />
+            </div>
+            <button (click)="requestToken(tokenId.value)" type="button" class="btn btn-lg btn-success mt-5 w-100"
+              [disabled]="isSendingTransaction">
+              <div *ngIf="!isSendingTransaction; else mintingSpinner">
+                Request Token
+              </div>
+            </button>
+            <button (click)="mintToken(tokenId.value)" type="button" class="btn btn-lg btn-primary mt-3 w-100"
+              [disabled]="isSendingTransaction || (signer === undefined)">
+              <div *ngIf="!isSendingTransaction; else mintingSpinner">
+                Mint Token
+              </div>
+            </button>
+            <ng-template #mintingSpinner>
+              <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            </ng-template>
+            <button type="button" class="btn btn-lg btn-secondary mt-3 w-100" data-bs-dismiss="modal">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="toast-container position-fixed top-0 end-0 p-3">
+    <ngb-toast *ngFor="let toast of toastService.toasts" [header]="toast.header" [autohide]="toast.autohide"
+      (hiddden)="toastService.remove(toast)">{{ toast.body }}</ngb-toast>
+  </div>
+</div>
