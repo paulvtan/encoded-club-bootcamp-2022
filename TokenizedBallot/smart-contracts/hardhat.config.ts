@@ -3,7 +3,15 @@ import "@nomiclabs/hardhat-ethers"
 import { HardhatUserConfig, task } from "hardhat/config"
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.17",
+  solidity: {
+    version: "0.8.17",
+    settings: {
+      optimizer: {
+        enabled: false,
+        runs: 1000,
+      },
+    },
+  },
 }
 
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
